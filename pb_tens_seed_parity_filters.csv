@@ -1,0 +1,5 @@
+id,name,enabled,applicable_if,expression,Unnamed: 5,Unnamed: 6,Unnamed: 7,Unnamed: 8,Unnamed: 9,Unnamed: 10,Unnamed: 11,Unnamed: 12,Unnamed: 13,Unnamed: 14
+PB_TENS_SEED23_ELIM_ODD_SUM,"If seed is 2E-3O, eliminate odd-sum next (prefer even)",True,(sum(d % 2 == 0 for d in seed_tens) == 2 and sum(d % 2 == 1 for d in seed_tens) == 3),(tens_sum % 2 == 1),,,,,,,,,,
+PB_TENS_SEED23_ELIM_NOT_3E2O,"If seed is 2E-3O, eliminate anything not 3E-2O (aggressive)",False,(sum(d % 2 == 0 for d in seed_tens) == 2 and sum(d % 2 == 1 for d in seed_tens) == 3),not (tens_even_count == 3 and tens_odd_count == 2),,,,,,,,,,
+PB_TENS_SEED32_ELIM_TAILS,"If seed is 3E-2O, eliminate tail patterns (1E-4O, 5E-0O)",True,(sum(d % 2 == 0 for d in seed_tens) == 3 and sum(d % 2 == 1 for d in seed_tens) == 2),"(tens_even_count in {1,5})",,,,,,,,,,
+PB_TENS_SEED32_ELIM_NOT_MAJORS,"If seed is 3E-2O, eliminate patterns not in {3E-2O, 2E-3O} (aggressive)",False,(sum(d % 2 == 0 for d in seed_tens) == 3 and sum(d % 2 == 1 for d in seed_tens) == 2),not ((tens_even_count == 3 and tens_odd_count == 2) or (tens_even_count == 2 and tens_odd_count == 3)),,,,,,,,,,
