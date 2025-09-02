@@ -1,0 +1,10 @@
+id,name,enabled,applicable_if,expression,Unnamed: 5,Unnamed: 6,Unnamed: 7,Unnamed: 8,Unnamed: 9,Unnamed: 10,Unnamed: 11,Unnamed: 12,Unnamed: 13,Unnamed: 14
+PB_TENS_SUM_EQ_05,Eliminate if Tens-Sum = 5,True,,(tens_sum == 5),,,,,,,,,,
+PB_TENS_SUM_EQ_06,Eliminate if Tens-Sum = 6,True,,(tens_sum == 6),,,,,,,,,,
+PB_TENS_SUM_EQ_07,Eliminate if Tens-Sum = 7,True,,(tens_sum == 7),,,,,,,,,,
+PB_TENS_SUM_EQ_08,Eliminate if Tens-Sum = 8,True,,(tens_sum == 8),,,,,,,,,,
+PB_TENS_SUM_EQ_21,Eliminate if Tens-Sum = 21,True,,(tens_sum == 21),,,,,,,,,,
+PB_TENS_SUM_EQ_22,Eliminate if Tens-Sum = 22,True,,(tens_sum == 22),,,,,,,,,,
+PB_TENS_SUM_EQ_26,Eliminate if Tens-Sum = 26,True,,(tens_sum == 26),,,,,,,,,,
+PB_TENS_SUM_EQ_09,Eliminate if Tens-Sum = 9,True,,(tens_sum == 9),,,,,,,,,,
+PB_TENS_SUM_EQ_23,Eliminate if Tens-Sum = 23,True,,(tens_sum == 23),,,,,,,,,,

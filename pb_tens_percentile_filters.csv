@@ -1,0 +1,6 @@
+id,name,enabled,applicable_if,expression,Unnamed: 5,Unnamed: 6,Unnamed: 7,Unnamed: 8,Unnamed: 9,Unnamed: 10,Unnamed: 11,Unnamed: 12,Unnamed: 13,Unnamed: 14
+PB_TENS_KEEP_P10_P90,Eliminate if Tens-Sum NOT in P10–P90 (10–20),True,,not (10 <= tens_sum <= 20),,,,,,,,,,
+PB_TENS_KEEP_P20_P80,Eliminate if Tens-Sum NOT in P20–P80 (11–19),True,,not (11 <= tens_sum <= 19),,,,,,,,,,
+PB_TENS_KEEP_P30_P70,Eliminate if Tens-Sum NOT in P30–P70 (13–17),True,,not (13 <= tens_sum <= 17),,,,,,,,,,
+PB_TENS_LOWTAIL_LT_P10,Eliminate if Tens-Sum < P10 (10),True,,(tens_sum < 10),,,,,,,,,,
+PB_TENS_HIGHTAIL_GT_P90,Eliminate if Tens-Sum > P90 (20),True,,(tens_sum > 20),,,,,,,,,,
