@@ -23,7 +23,7 @@ def sum_category(total: int) -> str:
         return 'High'
 
 # ========================
-# Filter loading (15-col)
+# Filter loading
 # ========================
 def load_filters(paths):
     filters = []
@@ -112,16 +112,25 @@ def main():
     st.sidebar.header("🎯 Tens-Only Manual Filter Runner")
 
     # Filter sources
-    filters_path = st.sidebar.file_uploader("Upload filters CSV", type=["csv"])
-    filters = load_filters(filters_path) if filters_path else []
+    uploaded = st.sidebar.file_uploader("Upload filters CSV", type=["csv"])
+    if uploaded:
+        tmp = "user_filters.csv"
+        with open(tmp, "wb") as f:
+            f.write(uploaded.getbuffer())
+        filters = load_filters(tmp)
+    elif os.path.exists("filters_tens.csv"):
+        filters = load_filters("filters_tens.csv")
+    else:
+        filters = []
 
+    # Seeds
     seed = st.sidebar.text_input("Seed tens (5 digits 0–6):", "").strip()
     prev_seed = st.sidebar.text_input("Prev tens (optional):", "").strip()
     prev_prev = st.sidebar.text_input("Prev-prev tens (optional):", "").strip()
     method = st.sidebar.selectbox("Generation Method:", ["1-digit", "2-digit pair"])
-    hot_input = st.sidebar.text_input("Hot tens digits (comma-separated):", "")
-    cold_input = st.sidebar.text_input("Cold tens digits (comma-separated):", "")
-    due_input = st.sidebar.text_input("Due digits (comma-separated):", "")
+    hot_input = st.sidebar.text_input("Hot tens digits:", "")
+    cold_input = st.sidebar.text_input("Cold tens digits:", "")
+    due_input = st.sidebar.text_input("Due digits:", "")
     due_digits = [int(x) for x in due_input.split(",") if x.strip().isdigit()]
 
     if len(seed) != 5 or any(c not in TENS_DOMAIN for c in seed):
@@ -146,7 +155,6 @@ def main():
     select_all = st.sidebar.checkbox("Select/Deselect All Filters", value=False)
     hide_zero = st.sidebar.checkbox("Hide filters with 0 cuts", value=True)
 
-    # Sort by aggressiveness
     sorted_filters = sorted(filters, key=lambda f: -init_counts.get(f['id'], 0))
     display_filters = [f for f in sorted_filters if init_counts.get(f['id'], 0) > 0] if hide_zero else sorted_filters
 
@@ -171,8 +179,10 @@ def main():
             pool = survivors
 
     st.subheader(f"Remaining after filters: {len(pool)}")
+    with st.expander("Show survivors"):
+        st.write(pool)
+
     df_out = pd.DataFrame({"combo": pool})
-    st.dataframe(df_out, use_container_width=True)
     st.download_button("Download survivors CSV", df_out.to_csv(index=False), "survivors.csv", "text/csv")
 
 if __name__ == "__main__":
