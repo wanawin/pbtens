@@ -7,7 +7,7 @@ import pandas as pd
 # ---------------------------
 # Tens-only model (0..6)
 # ---------------------------
-TENS_DOMAIN = '0123456'  # Powerball main balls tens digits 0..6 only
+TENS_DOMAIN = '0123456'  # main balls tens digits 0..6 only
 LOW_SET = set([0,1,2,3,4])
 HIGH_SET = set([5,6])
 
@@ -119,7 +119,7 @@ def build_ctx(seed, prev, prev2, combo, hot_input, cold_input, due_digits):
 # Streamlit UI
 # ========================
 def main():
-    st.sidebar.header("🎯 Powerball Tens-Only — Manual Filter Runner")
+    st.sidebar.header("🎯 Tens-Only — Manual Filter Runner")
 
     # --- Filter load
     default_path="pb_tens_filters_adapted.csv"
