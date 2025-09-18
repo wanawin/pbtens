@@ -1,7 +1,10 @@
+# pb_tens_filter_app.py  — Tens-only manual filter runner (with generate button,
+# applicability gating, per-filter counts, ordering, and select/deselect all)
 
 import streamlit as st
 from itertools import product
 from collections import Counter
+import re
 import csv, os
 import pandas as pd
 
@@ -13,25 +16,19 @@ LOW_SET = set([0,1,2,3,4])
 HIGH_SET = set([5,6])
 
 def sum_category(total: int) -> str:
-    if 0 <= total <= 10:
-        return 'Very Low'
-    elif 11 <= total <= 13:
-        return 'Low'
-    elif 14 <= total <= 17:
-        return 'Mid'
-    else:
-        return 'High'
+    if 0 <= total <= 10:   return 'Very Low'
+    elif 11 <= total <= 13:return 'Low'
+    elif 14 <= total <= 17:return 'Mid'
+    else:                 return 'High'
 
 # ========================
 # Filter loading (15-col)
 # ========================
 def load_filters(paths):
     filters = []
-    if not isinstance(paths, (list, tuple)):
-        paths = [paths]
+    if not isinstance(paths, (list, tuple)): paths = [paths]
     for path in paths:
-        if not path or not os.path.exists(path):
-            continue
+        if not path or not os.path.exists(path): continue
         with open(path, newline='', encoding='utf-8') as f:
             reader = csv.DictReader(f)
             for raw in reader:
@@ -46,7 +43,7 @@ def load_filters(paths):
                 expr = row.get('expression') or 'False'
                 try:
                     row['applicable_code'] = compile(applicable, '<applicable>', 'eval')
-                    row['expr_code'] = compile(expr, '<expr>', 'eval')
+                    row['expr_code']        = compile(expr, '<expr>', 'eval')
                 except SyntaxError as e:
                     st.sidebar.warning(f"Syntax error in filter {row.get('id','?')}: {e}")
                     continue
@@ -59,49 +56,26 @@ def load_filters(paths):
 # ========================
 # Tens combo generation
 # ========================
-def generate_tens_combinations(seed_tens: str, method: str) -> list:
-    seed_tens = ''.join(sorted(seed_tens))
-    combos_set = set()
-
-    if method == '1-digit':
-        for d in seed_tens:
-            for p in product(TENS_DOMAIN, repeat=4):
-                key = ''.join(sorted(d + ''.join(p)))
-                combos_set.add(key)
-    else:
-        pairs = {''.join(sorted((seed_tens[i], seed_tens[j])))
-                 for i in range(len(seed_tens)) for j in range(i+1, len(seed_tens))}
-        for pair in pairs:
-            for p in product(TENS_DOMAIN, repeat=3):
-                key = ''.join(sorted(pair + ''.join(p)))
-                combos_set.add(key)
-
-    return sorted(combos_set)
-
-
 def generate_tens_combinations_both(seed_tens: str, method: str):
     """
     Return (RAW_with_duplicates, UNIQUE_sorted) combo keys as strings of 5 digits (0..6),
     where each key is the sorted multiset of tens digits, e.g. '00123'.
     """
     seed_tens = ''.join(sorted(seed_tens))
-    raw = []
-    uniq = set()
+    raw, uniq = [], set()
 
     if method == '1-digit':
         for d in seed_tens:
             for p in product(TENS_DOMAIN, repeat=4):
                 key = ''.join(sorted(d + ''.join(p)))
-                raw.append(key)
-                uniq.add(key)
+                raw.append(key); uniq.add(key)
     else:
         pairs = {''.join(sorted((seed_tens[i], seed_tens[j])))
                  for i in range(len(seed_tens)) for j in range(i+1, len(seed_tens))}
         for pair in pairs:
             for p in product(TENS_DOMAIN, repeat=3):
                 key = ''.join(sorted(pair + ''.join(p)))
-                raw.append(key)
-                uniq.add(key)
+                raw.append(key); uniq.add(key)
     return raw, sorted(uniq)
 
 # ========================
@@ -111,6 +85,12 @@ def multiset_shared(a_digits, b_digits):
     ca, cb = Counter(a_digits), Counter(b_digits)
     return sum((ca & cb).values())
 
+def digits_only_5(s: str) -> str:
+    """Accept '11344' or '1,1,3,4,4' etc.; return exactly 5 digits 0–6 as a string."""
+    if not s: return ""
+    digs = re.findall(r"[0-6]", s)
+    return ''.join(digs)
+
 def build_ctx(seed_tens_str: str,
               prev_tens_str: str,
               prev_prev_tens_str: str,
@@ -118,18 +98,18 @@ def build_ctx(seed_tens_str: str,
               hot_input: str,
               cold_input: str,
               due_digits_param: list):
-    seed_tens = [int(x) for x in seed_tens_str]
+    seed_tens = [int(x) for x in seed_tens_str] if seed_tens_str else []
     prev_tens = [int(x) for x in prev_tens_str] if prev_tens_str else []
     prev_prev_tens = [int(x) for x in prev_prev_tens_str] if prev_prev_tens_str else []
-    combo_tens = [int(c) for c in combo_str]
+    combo_tens = [int(c) for c in combo_str] if combo_str else []
 
-    tens_sum = sum(combo_tens)
-    tens_even = sum(1 for d in combo_tens if d % 2 == 0)
-    tens_odd = 5 - tens_even
-    tens_unique = len(set(combo_tens))
-    tens_range = max(combo_tens) - min(combo_tens)
-    tens_low = sum(1 for d in combo_tens if d in LOW_SET)
-    tens_high = sum(1 for d in combo_tens if d in HIGH_SET)
+    tens_sum = sum(combo_tens) if combo_tens else 0
+    tens_even = sum(1 for d in combo_tens if d % 2 == 0) if combo_tens else 0
+    tens_odd = (5 - tens_even) if combo_tens else 0
+    tens_unique = len(set(combo_tens)) if combo_tens else 0
+    tens_range = (max(combo_tens) - min(combo_tens)) if combo_tens else 0
+    tens_low = sum(1 for d in combo_tens if d in LOW_SET) if combo_tens else 0
+    tens_high = sum(1 for d in combo_tens if d in HIGH_SET) if combo_tens else 0
 
     hot_digits = [int(x) for x in hot_input.split(',') if x.strip().isdigit() and int(x) in range(7)]
     cold_digits = [int(x) for x in cold_input.split(',') if x.strip().isdigit() and int(x) in range(7)]
@@ -187,32 +167,33 @@ def main():
 
     # --- Filter sources
     default_filters_path = "pb_tens_filters_adapted.csv"
-    default_extra_path = "pb_tens_percentile_filters.csv"
+    default_extra_path   = "pb_tens_percentile_filters.csv"
     st.sidebar.caption("Filters default to adapted tens-only & optional percentile bands.")
     use_default = st.sidebar.checkbox("Use default adapted filters", value=True)
     uploaded_filters = st.sidebar.file_uploader("Upload additional filter CSV (optional)", type=["csv"])
 
     filter_paths = []
-    if use_default and os.path.exists(default_filters_path):
-        filter_paths.append(default_filters_path)
-    if os.path.exists(default_extra_path):
-        filter_paths.append(default_extra_path)
+    if use_default and os.path.exists(default_filters_path): filter_paths.append(default_filters_path)
+    if os.path.exists(default_extra_path):                      filter_paths.append(default_extra_path)
     if uploaded_filters is not None:
         upath = "user_filters.csv"
-        with open(upath, "wb") as f:
-            f.write(uploaded_filters.getbuffer())
+        with open(upath, "wb") as f: f.write(uploaded_filters.getbuffer())
         filter_paths.append(upath)
 
     filters = load_filters(filter_paths)
 
-    # --- Seed inputs
-    seed = st.sidebar.text_input("Seed tens (Draw 1-back, 5 digits 0–6):", placeholder="e.g., 23345").strip()
-    prev_seed = st.sidebar.text_input("Prev tens (Draw 2-back, 5 digits 0–6, optional):").strip()
-    prev_prev = st.sidebar.text_input("Prev-prev tens (Draw 3-back, 5 digits 0–6, optional):").strip()
+    # --- Seed inputs (accept comma formats too)
+    seed_raw      = st.sidebar.text_input("Seed tens (Draw 1-back, 5 digits 0–6):", placeholder="e.g., 2,3,3,4,5").strip()
+    prev_seed_raw = st.sidebar.text_input("Prev tens (Draw 2-back, optional):").strip()
+    prev_prev_raw = st.sidebar.text_input("Prev-prev tens (Draw 3-back, optional):").strip()
 
-    method = st.sidebar.selectbox("Generation Method:", ["1-digit", "2-digit pair"])
+    seed      = digits_only_5(seed_raw)
+    prev_seed = digits_only_5(prev_seed_raw)
+    prev_prev = digits_only_5(prev_prev_raw)
+
+    method    = st.sidebar.selectbox("Generation Method:", ["1-digit", "2-digit pair"])
     hot_input = st.sidebar.text_input("Hot tens digits (comma-separated 0–6, optional):").strip()
-    cold_input = st.sidebar.text_input("Cold tens digits (comma-separated 0–6, optional):").strip()
+    cold_input= st.sidebar.text_input("Cold tens digits (comma-separated 0–6, optional):").strip()
 
     # --- Due digits controls
     st.sidebar.markdown("---")
@@ -222,12 +203,12 @@ def main():
     manual_due_text = st.sidebar.text_input("Manual due digits (0–6, comma-separated)", value="")
     disable_due_filters_when_empty = st.sidebar.checkbox("Disable due-based filters when due set is empty", value=True)
 
-    def digits_from_str(s): return [int(x) for x in s] if s else []
+    def digs(s): return [int(x) for x in digits_only_5(s)]
     seeds_chain = [seed, prev_seed, prev_prev]
     seen = set(); used = 0
     for s in seeds_chain:
         if s and used < m:
-            seen.update(digits_from_str(s)); used += 1
+            seen.update(digs(s)); used += 1
     auto_due = [d for d in range(7) if d not in seen]
 
     manual_due = []
@@ -236,38 +217,42 @@ def main():
             tok = tok.strip()
             if tok.isdigit():
                 v = int(tok)
-                if 0 <= v <= 6:
-                    manual_due.append(v)
+                if 0 <= v <= 6: manual_due.append(v)
 
-    if due_mode == "Auto (from last m)":
-        due_digits_current = auto_due
-    elif due_mode == "Manual override":
-        due_digits_current = manual_due
-    else:
-        due_digits_current = sorted(set(auto_due) | set(manual_due))
+    if due_mode == "Auto (from last m)":     due_digits_current = auto_due
+    elif due_mode == "Manual override":      due_digits_current = manual_due
+    else:                                    due_digits_current = sorted(set(auto_due) | set(manual_due))
 
     st.sidebar.write(f"**Current due set:** {{ {', '.join(map(str, due_digits_current))} }}")
 
     # --- Track/test combos
     st.sidebar.markdown("---")
-    track_text = st.sidebar.text_area("Track/Test combos (tens as 5 digits, e.g., 00123, 23345; one per line or comma-separated):", height=120)
+    track_text = st.sidebar.text_area("Track/Test combos (tens as 5 digits; one per line or comma-separated):", height=120)
     preserve_tracked = st.sidebar.checkbox("Preserve tracked combos during filtering", value=True)
-    inject_tracked = st.sidebar.checkbox("Inject tracked combos even if not generated", value=False)
+    inject_tracked   = st.sidebar.checkbox("Inject tracked combos even if not generated", value=False)
 
-    # Input validation
-    if len(seed) != 5 or (not seed.isdigit()) or any(c not in TENS_DOMAIN for c in seed):
-        st.sidebar.error("Seed tens must be exactly 5 digits in 0–6 (e.g., 23345)."); return
-    if prev_seed and (len(prev_seed) != 5 or (not prev_seed.isdigit()) or any(c not in TENS_DOMAIN for c in prev_seed)):
-        st.sidebar.error("Prev tens must be 5 digits in 0–6 or left blank."); return
-    if prev_prev and (len(prev_prev) != 5 or (not prev_prev.isdigit()) or any(c not in TENS_DOMAIN for c in prev_prev)):
-        st.sidebar.error("Prev-prev tens must be 5 digits in 0–6 or left blank."); return
+    # Validation (before the run button)
+    if len(seed) != 5:
+        st.sidebar.error("Seed tens must include exactly five digits 0–6 (e.g., 23345 or 2,3,3,4,5).")
+        return
 
+    if prev_seed and len(prev_seed) != 5:
+        st.sidebar.error("Prev tens must be five digits 0–6 or left blank.")
+        return
+    if prev_prev and len(prev_prev) != 5:
+        st.sidebar.error("Prev-prev tens must be five digits 0–6 or left blank.")
+        return
 
+    # ---------- Generate button (prevents auto-start) ----------
+    if "generated" not in st.session_state: st.session_state.generated = False
+    run_clicked = st.sidebar.button("▶️ Generate baseline")
+    if run_clicked: st.session_state.generated = True
+    if not st.session_state.generated:
+        st.info("Set your inputs, then click **Generate baseline** to see filters and counts.")
+        return
 
-    # Generate pool — RAW (with duplicates) and UNIQUE baseline
+    # ---------- Baseline generation ----------
     raw_combos, unique_baseline = generate_tens_combinations_both(seed, method)
-
-    # Identify percentile/zone filters by source filename (auto-applied pre-dedup)
     zone_filters = [f for f in filters if f.get('is_percentile')]
 
     def apply_filter_list_raw(pool_list, flist):
@@ -281,15 +266,12 @@ def main():
                         eliminate = True; break
                 except Exception:
                     pass
-            if not eliminate:
-                survivors.append(combo)
+            if not eliminate: survivors.append(combo)
         return survivors
 
-    # Phase A: Apply percentile filters BEFORE dedup (keeps only in-zone combos)
-    if zone_filters:
-        zone_survivors_raw = apply_filter_list_raw(raw_combos, zone_filters)
-    else:
-        zone_survivors_raw = list(raw_combos)
+    # Phase A: apply zone filters pre-dedup
+    if zone_filters: zone_survivors_raw = apply_filter_list_raw(raw_combos, zone_filters)
+    else:            zone_survivors_raw = list(raw_combos)
 
     # Phase B: Deduplicate
     combos = sorted(set(zone_survivors_raw))
@@ -306,7 +288,7 @@ def main():
     ))
 
     # Only show non-zone filters in the manual list
-    ui_filters = [f for f in filters if not f.get('is_percentile')]
+    all_ui_filters = [f for f in filters if not f.get('is_percentile')]
 
     # Normalize tracked combos
     tracked_norm, invalid_tokens = normalize_combo_text(track_text)
@@ -317,17 +299,10 @@ def main():
     generated_set = set(combos)
     audit = {
         c: {
-            "combo": c,
-            "generated": (c in generated_set),
-            "preserved": bool(preserve_tracked),
-            "injected": False,
-            "eliminated": False,
-            "eliminated_by": None,
-            "eliminated_name": None,
-            "eliminated_order": None,
-            "would_eliminate_by": None,
-            "would_eliminate_name": None,
-            "would_eliminate_order": None,
+            "combo": c, "generated": (c in generated_set),
+            "preserved": bool(preserve_tracked), "injected": False,
+            "eliminated": False, "eliminated_by": None, "eliminated_name": None, "eliminated_order": None,
+            "would_eliminate_by": None, "would_eliminate_name": None, "would_eliminate_order": None,
         } for c in tracked_norm
     }
 
@@ -335,13 +310,29 @@ def main():
         for c in tracked_norm:
             if c not in generated_set:
                 combos.append(c); generated_set.add(c)
-                if c in audit:
-                    audit[c]["injected"] = True
+                if c in audit: audit[c]["injected"] = True
 
-    # Initial elimination counts
-    init_counts = {flt['id']: 0 for flt in ui_filters}
-    for flt in ui_filters:
-        # Skip due-based filters if requested and due set empty
+    # ---------- Evaluate APPLICABILITY once (no combo context) ----------
+    # We provide a context that includes seed/due variables but no combo_tens,
+    # so applicability stays independent from per-combo logic.
+    app_ctx = build_ctx(seed, prev_seed, prev_prev, combo_str="", hot_input=hot_input, cold_input=cold_input, due_digits_param=due_digits_current)
+
+    applicable_filters = []
+    for flt in all_ui_filters:
+        applicable = True
+        try:
+            applicable = bool(eval(flt['applicable_code'], app_ctx, app_ctx))
+        except Exception:
+            applicable = True  # if in doubt, show it
+        if disable_due_filters_when_empty and not due_digits_current and 'due_digits' in flt.get('expr_str',''):
+            # still "applicable", but we may skip effect later; we still show it
+            pass
+        if applicable:
+            applicable_filters.append(flt)
+
+    # ---------- Initial elimination counts (per filter vs baseline) ----------
+    init_counts = {flt['id']: 0 for flt in applicable_filters}
+    for flt in applicable_filters:
         if disable_due_filters_when_empty and not due_digits_current and 'due_digits' in flt.get('expr_str',''):
             init_counts[flt['id']] = 0; continue
         ic = 0
@@ -356,29 +347,31 @@ def main():
 
     st.sidebar.markdown(f"**Generated (pre-filter):** {len(combos)} combos")
     select_all = st.sidebar.checkbox("Select/Deselect All Filters", value=False)
-    hide_zero = st.sidebar.checkbox("Hide filters with 0 initial eliminations", value=True)
+    hide_zero  = st.sidebar.checkbox("Hide filters with 0 initial eliminations", value=True)
 
-    sorted_filters = sorted(ui_filters, key=lambda flt: (init_counts[flt['id']] == 0, -init_counts[flt['id']]))
+    # Order by aggressiveness (most → least); optionally hide zeros
+    sorted_filters = sorted(applicable_filters, key=lambda flt: (init_counts[flt['id']] == 0, -init_counts[flt['id']]))
     display_filters = [f for f in sorted_filters if init_counts[f['id']] > 0] if hide_zero else sorted_filters
 
-    # Apply selected filters
+    # ---------- Manual application with dynamic counts ----------
     pool = list(combos)
     dynamic_counts = {}
-    st.header("🔧 Manual Filters (tens-only)")
+    st.header("🔧 Manual Filters (tens-only) — ordered by initial cuts (descending)")
+
     order_index = 0
     for flt in display_filters:
         order_index += 1
         key = f"filter_{flt['id']}"
-        default_checked = select_all and flt['enabled_default']
-        checked = st.checkbox(f"{flt['id']}: {flt['name']} — init cuts {init_counts[flt['id']]}",
-                              key=key, value=default_checked)
+        default_checked = bool(select_all)  # explicit: master checkbox controls default
+        label = f"**{flt['id']}** — {flt.get('name','(no name)')}  |  " \
+                f"init cuts: **{init_counts[flt['id']]}**"
+        checked = st.checkbox(label, key=key, value=default_checked)
+
         if checked:
-            # Skip due-based filter if requested and there are no due digits
             if disable_due_filters_when_empty and not due_digits_current and 'due_digits' in flt.get('expr_str',''):
                 dynamic_counts[flt['id']] = 0
                 continue
-            survivors_pool = []
-            dc = 0
+            survivors_pool, dc = [], 0
             for combo in pool:
                 ctx = build_ctx(seed, prev_seed, prev_prev, combo, hot_input, cold_input, due_digits_current)
                 eliminate = False
@@ -405,6 +398,8 @@ def main():
                 else:
                     survivors_pool.append(combo)
             dynamic_counts[flt['id']] = dc
+            # live badge
+            st.caption(f"Applied cuts: **{dc}**")
             pool = survivors_pool
 
     st.subheader(f"Remaining after manual filters: {len(pool)}")
@@ -437,7 +432,12 @@ def main():
             "injected","preserved"
         ])
         st.dataframe(df_audit, use_container_width=True)
-        st.download_button("Download audit (CSV)", df_audit.to_csv(index=False), file_name="pb_tens_audit_tracked.csv", mime="text/csv")
+        st.download_button(
+            "Download audit (CSV)",
+            df_audit.to_csv(index=False).encode("utf-8"),
+            file_name="pb_tens_audit_tracked.csv",
+            mime="text/csv"
+        )
 
     # Survivors
     st.markdown("### ✅ Survivors")
@@ -453,13 +453,22 @@ def main():
                     st.write(c)
             st.write("---")
         for c in pool:
-            if c not in tracked_set:
-                st.write(c)
+            if c not in tracked_set: st.write(c)
 
     # Downloads
     df_out = pd.DataFrame({"tens_combo": pool})
-    st.download_button("Download survivors (CSV)", df_out.to_csv(index=False), file_name="pb_tens_survivors.csv", mime="text/csv")
-    st.download_button("Download survivors (TXT)", "\n".join(pool), file_name="pb_tens_survivors.txt", mime="text/plain")
+    st.download_button(
+        "Download survivors (CSV)",
+        df_out.to_csv(index=False).encode("utf-8"),
+        file_name="pb_tens_survivors.csv",
+        mime="text/csv"
+    )
+    st.download_button(
+        "Download survivors (TXT)",
+        "\n".join(pool).encode("utf-8"),
+        file_name="pb_tens_survivors.txt",
+        mime="text/plain"
+    )
 
 if __name__ == "__main__":
     main()
