@@ -153,8 +153,8 @@ def build_ctx(combo_str: str, hot: list[int], cold: list[int], due: list[int]) -
 # Streamlit App (Pick-5 style)
 # ==============================
 def main():
-    st.set_page_config(page_title="Powerball Tens Manual Filter Runner", layout="wide")
-    st.title("🎯 Powerball Tens — Manual Filter Runner")
+    st.set_page_config(page_title="Tens Manual Filter Runner", layout="wide")
+    st.title("🎯Tens — Manual Filter Runner")
 
     # ---- Sidebar: inputs ----
     seed = st.sidebar.text_input("Draw 1-back (required, 5 digits 0–6):", "").strip()
