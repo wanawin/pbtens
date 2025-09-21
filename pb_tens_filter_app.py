@@ -182,8 +182,8 @@ def build_ctx(
 # Streamlit App
 # ==============================
 def main():
-    st.set_page_config(page_title="Powerball Tens Manual Filter Runner", layout="wide")
-    st.title("🎯 Powerball Tens — Manual Filter Runner")
+    st.set_page_config(page_title="Tens Manual Filter Runner", layout="wide")
+    st.title("🎯Tens — Manual Filter Runner")
 
     # ---- Sidebar inputs ----
     seed = st.sidebar.text_input("Draw 1-back (required, 5 digits 0–6):", "").strip()
