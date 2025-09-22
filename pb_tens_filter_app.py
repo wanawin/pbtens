@@ -1,198 +1,227 @@
-# pb_tens_filter_app.py — Powerball tens-only manual filter runner
-
-from __future__ import annotations
-import os, csv
+import streamlit as st
+import csv
+import os
 from collections import Counter
 from itertools import product
-from typing import List, Dict, Any, Tuple
-
 import pandas as pd
-import streamlit as st
 
 # ==============================
-# Config
+# Globals
 # ==============================
-DIGITS = "0123456"
-FILTER_MAIN = "pb_tens_filters_adapted.csv"
-FILTER_PCT  = "pb_tens_percentile_filters.csv"
-
-LOW_SET = {0,1,2,3,4}
-HIGH_SET = {5,6}
+FILTER_CSV = "pb_tens_filters_adapted.csv"
+PERCENTILE_CSV = "pb_tens_percentile_filters.csv"
+DIGITS = "0123456"   # tens domain only
 
 # ==============================
 # Helpers
 # ==============================
-def parse_int_list_csv(txt: str, lo: int, hi: int) -> List[int]:
-    out=[]
-    for tok in txt.split(","):
-        tok=tok.strip()
-        if tok.isdigit():
-            v=int(tok)
-            if lo<=v<=hi: out.append(v)
-    return out
+def safe_id(raw: str, fallback: str) -> str:
+    return (raw or fallback).strip()
 
-def multiset_shared(a: List[int], b: List[int]) -> int:
-    ca,cb=Counter(a),Counter(b)
-    return sum((ca&cb).values())
+def load_filters(paths: list[str]) -> list[dict]:
+    filters: list[dict] = []
+    for path in paths:
+        if not os.path.exists(path):
+            continue
+        with open(path, newline="", encoding="utf-8") as f:
+            rdr = csv.DictReader(f)
+            for idx, raw in enumerate(rdr):
+                row = { (k or "").lower().strip(): (v if isinstance(v, str) else v)
+                        for k, v in raw.items() }
 
-# ==============================
-# Filters
-# ==============================
-def load_filters(path: str, is_pct=False) -> List[Dict[str,Any]]:
-    if not os.path.exists(path): return []
-    out=[]
-    with open(path,newline="",encoding="utf-8") as f:
-        rdr=csv.DictReader(f)
-        for i,row in enumerate(rdr):
-            fid=row.get("id") or f"row{i+1}"
-            lay=row.get("layman") or ""
-            stat=row.get("stat") or ""
-            expr=row.get("expression") or "False"
-            try:
-                code=compile(expr,f"<expr:{fid}>","eval")
-            except Exception as e:
-                code=None
-            out.append({"id":fid,"lay":lay,"stat":stat,"expr":expr,"code":code,"is_pct":is_pct})
-    return out
+                fid = safe_id(row.get("id",""), f"row{idx+1}")
+                layman = (row.get("layman") or row.get("layman_explanation") or "").strip()
+                stat = (row.get("stat") or "").strip()
+                expr = (row.get("expression") or "").strip()
 
-def load_all_filters()->List[Dict[str,Any]]:
-    flts=load_filters(FILTER_MAIN,False)
-    if os.path.exists(FILTER_PCT):
-        flts+=load_filters(FILTER_PCT,True)
-    return flts
+                if not expr:
+                    continue
 
-# ==============================
-# Combo generation
-# ==============================
-def generate(seed:str,method:str)->Tuple[List[str],List[str]]:
-    seed="".join(sorted(seed))
-    raw=[]; uniq=set()
-    if method=="1-digit":
+                try:
+                    code = compile(expr, f"<expr:{fid}>", "eval")
+                except SyntaxError as e:
+                    filters.append({
+                        "id": fid, "layman": layman, "stat": stat,
+                        "expr_code": None, "expr_text": expr,
+                        "compile_error": str(e),
+                        "is_percentile": (os.path.basename(path) == os.path.basename(PERCENTILE_CSV))
+                    })
+                    continue
+
+                filters.append({
+                    "id": fid, "layman": layman, "stat": stat,
+                    "expr_code": code, "expr_text": expr,
+                    "compile_error": None,
+                    "is_percentile": (os.path.basename(path) == os.path.basename(PERCENTILE_CSV))
+                })
+    return filters
+
+def generate_combos(seed: str, method: str):
+    combos = []
+    seen = set()
+    if method == "1-digit":
         for d in seed:
-            for p in product(DIGITS,repeat=4):
-                k="".join(sorted(d+"".join(p)))
-                raw.append(k); uniq.add(k)
-    else:
-        pairs={ "".join(sorted((seed[i],seed[j]))) for i in range(5) for j in range(i+1,5)}
+            for p in product(DIGITS, repeat=4):
+                key = "".join(sorted(d + "".join(p)))
+                combos.append(key)
+                seen.add(key)
+    else:  # 2-digit pair
+        pairs = { "".join(sorted((seed[i], seed[j])))
+                  for i in range(len(seed)) for j in range(i+1, len(seed)) }
         for pair in pairs:
-            for p in product(DIGITS,repeat=3):
-                k="".join(sorted(pair+"".join(p)))
-                raw.append(k); uniq.add(k)
-    return raw,sorted(uniq)
+            for p in product(DIGITS, repeat=3):
+                key = "".join(sorted(pair + "".join(p)))
+                combos.append(key)
+                seen.add(key)
+    return combos, sorted(seen)
 
-# ==============================
-# Hot/Cold/Due
-# ==============================
-def compute_hotcold(draws:List[str]):
-    last6=[d for d in draws if d][:6]
-    if len(last6)<6: return [],[],[]
-    all_digits="".join(last6)
-    cnt=Counter(all_digits)
-    hot=[int(x) for x,_ in cnt.most_common(3)]
-    cold=[int(x) for x,_ in reversed(cnt.most_common())][:3]
-    due=[d for d in range(7) if str(d) not in all_digits]
-    return hot,cold,due
+def compute_hot_cold_due(draws: list[str]):
+    if len([d for d in draws if d]) < 6:
+        return [], [], []
 
-# ==============================
-# Eval
-# ==============================
-def ctx(seed:str,combo:str,hot,cold,due):
-    cd=[int(c) for c in combo]
-    return {"combo":combo,"cdigits":cd,
-            "seed":[int(c) for c in seed],
-            "hot_digits":hot,"cold_digits":cold,"due_digits":due,
-            "shared_tens":multiset_shared,"Counter":Counter}
+    last6 = [d for d in draws if d][:6]
+    all_digits = "".join(last6)
+    cnt = Counter(all_digits)
 
-def apply_once(pool:List[str],filters:List[Dict[str,Any]],ctx_base:Dict[str,Any]):
-    cut_counts={f["id"]:0 for f in filters}
-    surv=[]
+    hot = [int(x) for x, _ in cnt.most_common(3)]
+    cold = [int(x) for x, _ in cnt.most_common()[-3:]]
+    due = [d for d in range(7) if str(d) not in all_digits]
+
+    return hot, cold, due
+
+def run_filter_on_pool(pool, flt, ctx_base):
+    survivors = []
+    cut = 0
     for combo in pool:
-        c=ctx_base.copy(); c.update(ctx(ctx_base["seed_str"],combo,
-                                        ctx_base["hot_digits"],ctx_base["cold_digits"],ctx_base["due_digits"]))
-        elim=False
-        for f in filters:
-            if f["code"] is None: continue
-            try:
-                if eval(f["code"],{},c):
-                    cut_counts[f["id"]]+=1; elim=True; break
-            except Exception: pass
-        if not elim: surv.append(combo)
-    return surv,cut_counts
-
-# ==============================
-# UI
-# ==============================
-st.set_page_config(page_title="PB Tens Filter Runner",layout="wide")
-st.title("🎯 PB Tens Filter Runner")
-
-with st.sidebar:
-    seed=st.text_input("Draw 1-back (5 digits 0–6):","").strip()
-    prevs=[st.text_input(f"Draw {i}-back (opt):","").strip() for i in range(2,7)]
-    method=st.selectbox("Generation Method:",["1-digit","2-digit pair"])
-    hot_o=st.text_input("Hot override:","")
-    cold_o=st.text_input("Cold override:","")
-    due_o=st.text_input("Due override:","")
-    tracked=st.text_input("Track combo:","").strip()
-    select_all=st.checkbox("Select/Deselect All",value=False)
-    hide_zero=st.checkbox("Hide 0-cut filters",value=True)
-
-if len(seed)!=5 or any(c not in DIGITS for c in seed):
-    st.warning("Enter valid 5-digit seed (0–6)."); st.stop()
-
-auto_hot,auto_cold,auto_due=compute_hotcold([seed]+prevs)
-hot=parse_int_list_csv(hot_o,0,6) or auto_hot
-cold=parse_int_list_csv(cold_o,0,6) or auto_cold
-due=parse_int_list_csv(due_o,0,6) or auto_due
-
-filters=load_all_filters()
-raw,uniq=generate(seed,method)
-
-ctx_base={"seed":[int(c) for c in seed],"seed_str":seed,
-          "hot_digits":hot,"cold_digits":cold,"due_digits":due}
-
-survivors,init_cuts=apply_once(uniq,[f for f in filters if not f["is_pct"]],ctx_base)
-
-manual=[f for f in filters if not f["is_pct"]]
-sorted_manual=sorted(manual,key=lambda f:(init_cuts[f["id"]]==0,-init_cuts[f["id"]],f["id"]))
-
-display_filters=[f for f in sorted_manual if init_cuts[f["id"]]>0] if hide_zero else sorted_manual
-
-# Filter count header
-st.header(f"🛠 Manual Filters — {len(display_filters)} available")
-
-active_ids=[]
-for f in display_filters:
-    fid=f["id"]; label=f["lay"] or fid; hist=f["stat"]
-    init=init_cuts.get(fid,0)
-    cols=st.columns((1,6,2,2))
-    cols[0].write(fid)
-    cols[1].write(f"{label}{' — hist '+hist if hist else ''}")
-    cols[2].write(init)
-    checked=cols[3].checkbox("apply",key=f"chk_{fid}",value=select_all)
-    if checked: active_ids.append(fid)
-
-# Sequentially apply active filters
-pool=list(uniq)
-for f in display_filters:
-    if f["id"] not in active_ids: continue
-    new=[]
-    for combo in pool:
-        c=ctx_base.copy(); c.update(ctx(seed,combo,hot,cold,due))
+        cdigits = [int(c) for c in combo]
+        ctx = ctx_base | {"combo": combo, "cdigits": cdigits}
         try:
-            elim=eval(f["code"],{},c)
-        except Exception: elim=False
-        if not elim: new.append(combo)
-    pool=new
+            if flt["expr_code"] and eval(flt["expr_code"], {}, ctx):
+                cut += 1
+            else:
+                survivors.append(combo)
+        except Exception:
+            survivors.append(combo)
+    return survivors, cut
 
-st.subheader(f"Remaining after manual filters: {len(pool)}")
-if tracked:
-    if tracked in pool: st.success(f"Tracked {tracked} survived.")
-    else: st.error(f"Tracked {tracked} eliminated.")
+# ==============================
+# Streamlit App
+# ==============================
+def main():
+    st.title("🎯 Powerball Tens Filter App")
 
-with st.expander("Show survivors"):
-    for c in pool: st.write(c)
+    # --- Seed inputs
+    seed = st.sidebar.text_input("Draw 1-back (required):", "").strip()
+    prev2 = st.sidebar.text_input("Draw 2-back:", "").strip()
+    prev3 = st.sidebar.text_input("Draw 3-back:", "").strip()
+    prev4 = st.sidebar.text_input("Draw 4-back:", "").strip()
+    prev5 = st.sidebar.text_input("Draw 5-back:", "").strip()
+    prev6 = st.sidebar.text_input("Draw 6-back:", "").strip()
 
-if pool:
-    df=pd.DataFrame({"combo":pool})
-    st.download_button("Download CSV",df.to_csv(index=False),"survivors.csv","text/csv")
-    st.download_button("Download TXT","\n".join(pool),"survivors.txt","text/plain")
+    method = st.sidebar.selectbox("Generation Method:", ["1-digit", "2-digit pair"])
+
+    # --- Hot/cold/due
+    hot_override = st.sidebar.text_input("Hot digits (override, comma-separated):", "")
+    cold_override = st.sidebar.text_input("Cold digits (override, comma-separated):", "")
+    due_override = st.sidebar.text_input("Due digits (override, comma-separated):", "")
+
+    # --- Track combo
+    track_combo = st.sidebar.text_input("Track combo (e.g. 01234):", "").strip()
+
+    # --- Filter toggles
+    select_all = st.sidebar.checkbox("Select/Deselect All Filters", value=False)
+    hide_zero = st.sidebar.checkbox("Hide filters with 0 initial cuts", value=True)
+
+    # --- Validate
+    if len(seed) != 5 or any(ch not in DIGITS for ch in seed):
+        st.warning("⚠️ Enter a valid 5-digit tens seed (digits 0–6).")
+        return
+
+    # --- Auto hot/cold/due
+    draws = [seed, prev2, prev3, prev4, prev5, prev6]
+    auto_hot, auto_cold, auto_due = compute_hot_cold_due(draws)
+
+    hot = [int(x) for x in hot_override.split(",") if x.strip().isdigit()] or auto_hot
+    cold = [int(x) for x in cold_override.split(",") if x.strip().isdigit()] or auto_cold
+    due = [int(x) for x in due_override.split(",") if x.strip().isdigit()] or auto_due
+
+    st.sidebar.markdown(f"**Auto Hot:** {auto_hot}, **Auto Cold:** {auto_cold}, **Auto Due:** {auto_due}")
+
+    # --- Generate combos
+    raw_combos, unique_combos = generate_combos(seed, method)
+
+    # --- Load filters
+    filters = load_filters([FILTER_CSV, PERCENTILE_CSV])
+
+    percentile_filters = [f for f in filters if f["is_percentile"]]
+    manual_filters = [f for f in filters if not f["is_percentile"]]
+
+    ctx_base = {"seed": [int(c) for c in seed], "hot": hot, "cold": cold, "due": due}
+
+    # --- Phase A: percentile filters pre-dedup
+    pool = raw_combos
+    for flt in percentile_filters:
+        pool, _ = run_filter_on_pool(pool, flt, ctx_base)
+
+    # --- Phase B: dedup
+    pool = sorted(set(pool))
+
+    # --- Metrics
+    st.sidebar.markdown(f"""
+**Pipeline**
+- Raw generated: {len(raw_combos)}
+- Survivors after percentile: {len(pool)}
+- Unique enumeration: {len(unique_combos)}
+""")
+
+    # --- Manual filters
+    st.header("🛠 Manual Filters")
+    cut_counts = {}
+    for flt in manual_filters:
+        pool_test, cut = run_filter_on_pool(pool, flt, ctx_base)
+        cut_counts[flt["id"]] = cut
+
+    # Sort filters by aggressiveness
+    sorted_filters = sorted(manual_filters, key=lambda f: -cut_counts[f["id"]])
+    display_filters = [f for f in sorted_filters if cut_counts[f["id"]] > 0] if hide_zero else sorted_filters
+
+    st.markdown(f"**Applicable filters: {len(display_filters)}**")
+
+    survivors = pool.copy()
+    eliminated_by = None
+
+    for flt in display_filters:
+        label = f"{flt['id']}: {flt['layman']} | hist {flt['stat']} | cut {cut_counts[flt['id']]}"
+        checked = st.checkbox(label, value=select_all, key=f"flt_{flt['id']}")
+        if checked:
+            survivors, cut = run_filter_on_pool(survivors, flt, ctx_base)
+            if track_combo and eliminated_by is None:
+                if "".join(sorted(track_combo)) not in survivors:
+                    eliminated_by = flt['id']
+
+        st.markdown(f"Remaining: {len(survivors)}")
+
+    # --- Tracked combo status
+    if track_combo:
+        norm = "".join(sorted(track_combo))
+        if norm not in unique_combos:
+            st.sidebar.error("Tracked combo was NOT generated.")
+        elif eliminated_by:
+            st.sidebar.error(f"Tracked combo eliminated by {eliminated_by}.")
+        elif norm in survivors:
+            st.sidebar.success("Tracked combo survived all filters.")
+        else:
+            st.sidebar.warning("Tracked combo eliminated.")
+
+    # --- Survivors
+    st.subheader(f"✅ Final Survivors: {len(survivors)}")
+    with st.expander("Show survivors"):
+        st.write(survivors)
+
+    if survivors:
+        df = pd.DataFrame(survivors, columns=["combo"])
+        st.download_button("Download survivors (CSV)", df.to_csv(index=False), file_name="survivors.csv", mime="text/csv")
+        st.download_button("Download survivors (TXT)", "\n".join(survivors), file_name="survivors.txt", mime="text/plain")
+
+if __name__ == "__main__":
+    main()
