@@ -117,7 +117,7 @@ def run_filters(combos: list[str], filters: list[dict], ctx_base: dict, selected
 # Streamlit App
 # ==============================
 def main():
-    st.title("🎯 Powerball Tens Filter App")
+    st.title("🎯 Tens Filter App")
 
     # ----------------
     # Inputs
