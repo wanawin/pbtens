@@ -197,7 +197,7 @@ def auto_hot_cold_due(draws: list[str]):
 # App
 # -----------------------------------
 def main():
-    st.title("🎯 Powerball Tens Filter App")
+    st.title("🎯 Tens Filter App")
 
     # Inputs (6 seeds)
     seed  = st.sidebar.text_input("Draw 1-back (required):", "").strip()
