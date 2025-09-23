@@ -1,0 +1,5 @@
+zone,sums,coverage,rule
+Core Keep (Always),13-19,~47%,Always keep
+Expanded Mid,"10-12,20",~20%,Keep
+Edge (Optional),"9,21-22",~10%,Optional
+Outlier (Trim),"<=8,>=23",~23%,Trim
