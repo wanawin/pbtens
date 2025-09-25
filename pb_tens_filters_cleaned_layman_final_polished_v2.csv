@@ -1,0 +1,417 @@
+filter_id,variant,expression,layman_explanation,stat,source
+01F183,tens,"(sum(1 for d in combo_digits if d in {2,3,5,7}) >= 4 and winner_structure == 5)","Eliminate if 4 or more odd digits (2,3,5,7) appear in the combo.",26/311,keeper
+0F001,tens,(winner == 1),Eliminate if the tens sum equals 1).,0/311,keeper
+0F062,tens,(winner % 10 == 6),Eliminate if the tens sum ends with 6.,34/311,keeper
+0F064,tens,(winner % 10 == 5),Eliminate if the tens sum ends with 5.,35/311,keeper
+0F065,tens,(winner % 10 == 4),Eliminate if the tens sum ends with 4.,34/311,keeper
+0F204,tens,(max(combo_digits) - min(combo_digits) <4 and winner_structure == 5),Eliminate if condition: (max(combo_digits) - min(combo_digits) <4 and winner_structure == 5),0/311,keeper
+0F207,tens,(winner >40),Eliminate if the tens sum is greater than 40).,0/311,keeper
+0F235,tens,(winner==45 and seed<30),Eliminate if condition: (winner==45 and seed<30),0/311,keeper
+0F236,tens,(winner==44 and seed<30),Eliminate if condition: (winner==44 and seed<30),0/311,keeper
+0F237,tens,(winner==43 and seed<30),Eliminate if condition: (winner==43 and seed<30),0/311,keeper
+0F238,tens,(winner==42 and seed<30),Eliminate if condition: (winner==42 and seed<30),0/311,keeper
+0F239,tens,(winner==41 and seed<30),Eliminate if condition: (winner==41 and seed<30),0/311,keeper
+0F240,tens,(winner==5),Eliminate if condition: (winner==5),2/311,keeper
+0F242,tens,(winner==3),Eliminate if condition: (winner==3),0/311,keeper
+0F243,tens,(winner==2),Eliminate if condition: (winner==2),0/311,keeper
+0F298,tens,(sum(1 for d in combo_digits if d in seed_digits) >=5 and winner <14 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 14.,9/311,keeper
+0F299,tens,(sum(1 for d in combo_digits if d in seed_digits) >=5 and winner <13and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 13and.,9/311,keeper
+0F300,tens,(sum(1 for d in combo_digits if d in seed_digits) >=5 and winner <12 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 12.,6/311,keeper
+0F301,tens,(sum(1 for d in combo_digits if d in seed_digits) >=5 and winner <11 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 11.,5/311,keeper
+0F302,tens,(sum(1 for d in combo_digits if d in seed_digits) >=5 and winner <10 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 10.,2/311,keeper
+0F564,tens,(len(set(combo_digits).intersection(seed_digits)) == 1),Eliminate if condition: (len(set(combo_digits).intersection(seed_digits)) == 1),0/311,keeper
+0F620,tens,(winner == 2),Eliminate if the tens sum equals 2).,0/311,keeper
+0F621,tens,(winner == 3),Eliminate if the tens sum equals 3).,0/311,keeper
+0F627,tens,(sum(d % 2 == 1 for d in combo_digits) == 1),Eliminate if the combo has exactly 1 odd digit.,3/311,keeper
+0F634,tens,(sum(d % 2 == 1 for d in combo_digits) == 1),Eliminate if the combo has exactly 1 odd digit.,3/311,keeper
+0F638,tens,(winner < 6),Eliminate if the tens sum is less than 6).,2/311,keeper
+0F643,tens,(sum(d % 2 == 1 for d in combo_digits) == 2),Eliminate if the combo has exactly 2 odd digits.,15/311,keeper
+0F647,tens,(winner > 42),Eliminate if the tens sum is greater than 42).,0/311,keeper
+0F652,tens,(winner < 8),Eliminate if the tens sum is less than 8).,11/311,keeper
+0F656,tens,(winner < 14),Eliminate if the tens sum is less than 14).,101/311,keeper
+0F658,tens,(winner < 6),Eliminate if the tens sum is less than 6).,2/311,keeper
+0F662,tens,(sum(d % 2 == 1 for d in combo_digits) == 1),Eliminate if the combo has exactly 1 odd digit.,3/311,keeper
+0F665,tens,(sum(d % 2 == 1 for d in combo_digits) == 1),Eliminate if the combo has exactly 1 odd digit.,3/311,keeper
+0F666,tens,(winner < 11),Eliminate if the tens sum is less than 11).,42/311,keeper
+0F668,tens,(winner < 11),Eliminate if the tens sum is less than 11).,42/311,keeper
+0F670,tens,(winner < 10),Eliminate if the tens sum is less than 10).,26/311,keeper
+0F672,tens,(sum(d % 2 == 0 for d in combo_digits) == 1),Eliminate if the combo has exactly 1 even digit.,1/311,keeper
+0F673,tens,(winner < 10),Eliminate if the tens sum is less than 10).,26/311,keeper
+0F675,tens,(sum(d % 2 == 0 for d in combo_digits) == 1),Eliminate if the combo has exactly 1 even digit.,1/311,keeper
+0F678,tens,(winner < 12),Eliminate if the tens sum is less than 12).,56/311,keeper
+0F681,tens,(winner < 7),Eliminate if the tens sum is less than 7).,4/311,keeper
+0F682,tens,(winner < 14),Eliminate if the tens sum is less than 14).,101/311,keeper
+0F684,tens,(sum(d % 2 == 1 for d in combo_digits) == 1),Eliminate if the combo has exactly 1 odd digit.,3/311,keeper
+0F686,tens,(winner < 13),Eliminate if the tens sum is less than 13).,76/311,keeper
+0F687,tens,(winner < 11),Eliminate if the tens sum is less than 11).,42/311,keeper
+0F689,tens,(winner < 7),Eliminate if the tens sum is less than 7).,4/311,keeper
+0F691,tens,(winner < 9),Eliminate if the tens sum is less than 9).,16/311,keeper
+0F693,tens,(sum(d % 2 == 1 for d in combo_digits) == 1),Eliminate if the combo has exactly 1 odd digit.,3/311,keeper
+0F694,tens,(sum(d % 2 == 0 for d in combo_digits) == 1),Eliminate if the combo has exactly 1 even digit.,1/311,keeper
+0F696,tens,(winner < 19),Eliminate if the tens sum is less than 19).,232/311,keeper
+0F697,tens,(winner > 31),Eliminate if the tens sum is greater than 31).,0/311,keeper
+0F699,tens,(winner < 8),Eliminate if the tens sum is less than 8).,11/311,keeper
+0F700,tens,(winner < 11),Eliminate if the tens sum is less than 11).,42/311,keeper
+0F702,tens,(winner < 15),Eliminate if the tens sum is less than 15).,133/311,keeper
+0F704,tens,(sum(d % 2 == 0 for d in combo_digits) == 1),Eliminate if the combo has exactly 1 even digit.,1/311,keeper
+0F706,tens,(winner < 19),Eliminate if the tens sum is less than 19).,232/311,keeper
+0F710,tens,(winner < 16),Eliminate if the tens sum is less than 16).,165/311,keeper
+0F712,tens,(winner < 14),Eliminate if the tens sum is less than 14).,101/311,keeper
+0F713,tens,(sum(d % 2 == 1 for d in combo_digits) == 1),Eliminate if the combo has exactly 1 odd digit.,3/311,keeper
+0F716,tens,(sum(d % 2 == 1 for d in combo_digits) == 2),Eliminate if the combo has exactly 2 odd digits.,15/311,keeper
+105F552,tens,"(not any(mirror.get(d,None) in combo_digits for d in combo_digits) and max(combo_digits) - min(combo_digits) <= 4)",Eliminate if the spread (highest minus lowest digit) is 4 or less.,3/311,keeper
+10F210,tens,(winner <13 or winner >35),Eliminate if the tens sum is greater than 35).,76/311,keeper
+10F214,tens,(not any(v in combo_vtracs for v in seed_vtracs)),Eliminate if condition: (not any(v in combo_vtracs for v in seed_vtracs)),0/311,keeper
+10F310,tens,(sum(1 for d in combo_digits if d in seed_digits) >=4 and winner <15 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 15.,13/311,keeper
+113F223,tens,(5 not in combo_digits and 6 not in combo_digits),Eliminate if condition: (5 not in combo_digits and 6 not in combo_digits),18/311,keeper
+114F219,tens,(4 not in combo_digits and 5 not in combo_digits),Eliminate if condition: (4 not in combo_digits and 5 not in combo_digits),20/311,keeper
+114F246,tens,(5 not in combo_digits and 4 not in combo_digits),Eliminate if condition: (5 not in combo_digits and 4 not in combo_digits),20/311,keeper
+116F195,tens,(2 not in combo_digits and 4 not in combo_digits),Eliminate if condition: (2 not in combo_digits and 4 not in combo_digits),14/311,keeper
+11F194,tens,(winner <11 or winner >33),Eliminate if the tens sum is greater than 33).,42/311,keeper
+11F212,tens,(winner <11 or winner >33),Eliminate if the tens sum is greater than 33).,42/311,keeper
+11F342,tens,(sum(1 for d in combo_digits if d in seed_digits)>=3 and winner<13 and winner_structure == 5 and winner_structure == 5),Eliminate if the combo includes digits from the seed exceeding the threshold (see expression).,9/311,keeper
+123F328,tens,(winner<20 or winner>28),Eliminate if the tens sum is greater than 28.,263/311,keeper
+128F222,tens,(2 not in combo_digits and 1 not in combo_digits),Eliminate if condition: (2 not in combo_digits and 1 not in combo_digits),18/311,keeper
+12F557,tens,"(sorted(Counter(combo_digits).values()) == [1, 2, 2] and len(set(combo_digits)) == 3 and all(d not in mirror.values() for d in combo_digits) and (max(combo_digits) - min(combo_digits) <= 4))",Eliminate if the spread (highest minus lowest digit) is 4 or less.,0/311,keeper
+132F197,tens,(3 not in combo_digits and 4 not in combo_digits),Eliminate if condition: (3 not in combo_digits and 4 not in combo_digits),12/311,keeper
+138F561,tens,(len(set(combo_digits).intersection(seed_digits)) == 1 and sum(d <= 4 for d in combo_digits) < 3),Eliminate if condition: (len(set(combo_digits).intersection(seed_digits)) == 1 and sum(d <= 4 for d in combo_digits) < 3),0/311,keeper
+13F558,tens,"(sorted(Counter(combo_digits).values()) == [1, 1, 3] and any(d in mirror.values() for d in combo_digits) and sum(d <= 4 for d in combo_digits) < 4)","Eliminate if condition: (sorted(Counter(combo_digits).values()) == [1, 1, 3] and any(d in mirror.values() for d in combo_digits) and sum(d <= 4 for d in combo_digits) < 4)",0/311,keeper
+142F213,tens,(winner <25 and sum(1 for d in combo_digits if d in seed_digits) >=3),Eliminate if the tens sum is less than 25.,306/311,keeper
+14F349,tens,(sum(1 for d in combo_digits if d in seed_digits)>=2 and winner<11 and winner_structure == 5 and winner_structure == 5),Eliminate if the combo includes digits from the seed exceeding the threshold (see expression).,5/311,keeper
+15F247,tens,(winner<12 or winner>20),Eliminate if the tens sum is greater than 20.,86/311,keeper
+16F341,tens,(sum(1 for d in combo_digits if d in seed_digits)>=3 and winner<14 and winner_structure == 5 and winner_structure == 5),Eliminate if the combo includes digits from the seed exceeding the threshold (see expression).,9/311,keeper
+16F534,tens,((0 <= seed <= 15) and (34 <= winner <= 45)),Eliminate if the tens sum is less than =.,0/311,keeper
+17F325,tens,(all(d%2 for d in combo_digits)),Eliminate if condition: (all(d%2 for d in combo_digits)),0/311,keeper
+18F258,tens,(not (12<=winner<=20)),Eliminate if condition: (not (12<=winner<=20)),86/311,keeper
+18F334,tens,(winner<12 or winner>20),Eliminate if the tens sum is greater than 20.,86/311,keeper
+18F348,tens,(sum(1 for d in combo_digits if d in seed_digits)>=2 and winner<12 and winner_structure == 5 and winner_structure == 5),Eliminate if the combo includes digits from the seed exceeding the threshold (see expression).,6/311,keeper
+18F533,tens,((34 <= seed <= 45) and (34 <= winner <= 45)),Eliminate if the tens sum is less than =.,0/311,keeper
+18F537,tens,((34 <= seed <= 45) and (0 <= winner <= 15)),Eliminate if the tens sum is less than =.,0/311,keeper
+18F542,tens,(winner_structure == 3),Eliminate if condition: (winner_structure == 3),0/311,keeper
+19F352,tens,(sum(1 for d in combo_digits if d in seed_digits)>=1 and winner<11and winner_structure == 5 and winner_structure == 5),Eliminate if the combo includes digits from the seed exceeding the threshold (see expression).,5/311,keeper
+1F192,tens,(winner <8 or winner >29),Eliminate if the tens sum is greater than 29).,11/311,keeper
+1F193,tens,(winner <10 or winner >30),Eliminate if the tens sum is greater than 30).,26/311,keeper
+1F206,tens,(winner <8 or winner >29),Eliminate if the tens sum is greater than 29).,11/311,keeper
+1F208,tens,(winner <10 or winner >30),Eliminate if the tens sum is greater than 30).,26/311,keeper
+1F229,tens,(winner==38 and seed<30),Eliminate if condition: (winner==38 and seed<30),0/311,keeper
+1F241,tens,(winner==4),Eliminate if condition: (winner==4),0/311,keeper
+1F295,tens,(sum(1 for d in combo_digits if d in seed_digits) >=5 and winner <17 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 17.,24/311,keeper
+1F296,tens,(sum(1 for d in combo_digits if d in seed_digits) >=5 and winner <16 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 16.,19/311,keeper
+1F297,tens,(sum(1 for d in combo_digits if d in seed_digits) >=5 and winner <15 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 15.,13/311,keeper
+1F543,tens,(winner_structure == 2),Eliminate if condition: (winner_structure == 2),0/311,keeper
+1F567,tens,(len(set(combo_digits)) < 5),Eliminate if condition: (len(set(combo_digits)) < 5),4/311,keeper
+1F579,tens,"(sorted(Counter(combo_digits).values()) == [2, 2, 1])","Eliminate if condition: (sorted(Counter(combo_digits).values()) == [2, 2, 1])",0/311,keeper
+1F582,tens,(3 in Counter(combo_digits).values()),Eliminate if condition: (3 in Counter(combo_digits).values()),167/311,keeper
+1F583,tens,(3 in Counter(combo_digits).values()),Eliminate if condition: (3 in Counter(combo_digits).values()),167/311,keeper
+1F587,tens,(3 in Counter(combo_digits).values()),Eliminate if condition: (3 in Counter(combo_digits).values()),167/311,keeper
+1F589,tens,"(sorted(Counter(combo_digits).values()) == [2, 2, 1])","Eliminate if condition: (sorted(Counter(combo_digits).values()) == [2, 2, 1])",0/311,keeper
+1F590,tens,(3 in Counter(combo_digits).values()),Eliminate if condition: (3 in Counter(combo_digits).values()),167/311,keeper
+1F594,tens,(3 in Counter(combo_digits).values()),Eliminate if condition: (3 in Counter(combo_digits).values()),167/311,keeper
+1F595,tens,"(sorted(Counter(combo_digits).values()) == [2, 2, 1])","Eliminate if condition: (sorted(Counter(combo_digits).values()) == [2, 2, 1])",0/311,keeper
+1F596,tens,(3 in Counter(combo_digits).values()),Eliminate if condition: (3 in Counter(combo_digits).values()),167/311,keeper
+1F601,tens,(len(set(combo_digits)) == 5),Eliminate if condition: (len(set(combo_digits)) == 5),54/311,keeper
+1F603,tens,(len(set(combo_digits).intersection(seed_digits)) == 1),Eliminate if condition: (len(set(combo_digits).intersection(seed_digits)) == 1),0/311,keeper
+1F605,tens,(len(set(combo_digits).intersection(seed_digits)) > 3),Eliminate if the combo shares more than 3 digits with the seed.,242/311,keeper
+1F606,tens,(len(set(combo_digits).intersection(seed_digits)) > 3),Eliminate if the combo shares more than 3 digits with the seed.,242/311,keeper
+1F608,tens,(len(set(combo_digits).intersection(seed_digits)) == 1),Eliminate if condition: (len(set(combo_digits).intersection(seed_digits)) == 1),0/311,keeper
+1F610,tens,(len(set(combo_digits).intersection(seed_digits)) == 1),Eliminate if condition: (len(set(combo_digits).intersection(seed_digits)) == 1),0/311,keeper
+1F611,tens,(3 in Counter(combo_digits).values()),Eliminate if condition: (3 in Counter(combo_digits).values()),167/311,keeper
+1F612,tens,(len(set(combo_digits).intersection(seed_digits)) == 1),Eliminate if condition: (len(set(combo_digits).intersection(seed_digits)) == 1),0/311,keeper
+1F613,tens,(len(set(combo_digits).intersection(seed_digits)) == 2),Eliminate if condition: (len(set(combo_digits).intersection(seed_digits)) == 2),13/311,keeper
+1F616,tens,(len(set(combo_digits).intersection(seed_digits)) == 1),Eliminate if condition: (len(set(combo_digits).intersection(seed_digits)) == 1),0/311,keeper
+1F617,tens,(len(set(combo_digits).intersection(seed_digits)) > 3),Eliminate if the combo shares more than 3 digits with the seed.,242/311,keeper
+1F622,tens,(winner == 5),Eliminate if the tens sum equals 5).,2/311,keeper
+1F625,tens,(winner > 38),Eliminate if the tens sum is greater than 38).,0/311,keeper
+1F631,tens,(winner > 31),Eliminate if the tens sum is greater than 31).,0/311,keeper
+1F633,tens,(sum(d % 2 == 0 for d in combo_digits) == 2),Eliminate if the combo has exactly 2 even digits.,5/311,keeper
+1F637,tens,(sum(d % 2 == 1 for d in combo_digits) == 1),Eliminate if the combo has exactly 1 odd digit.,3/311,keeper
+1F639,tens,(winner > 35),Eliminate if the tens sum is greater than 35).,0/311,keeper
+1F642,tens,(winner > 36),Eliminate if the tens sum is greater than 36).,0/311,keeper
+1F645,tens,(winner > 37),Eliminate if the tens sum is greater than 37).,0/311,keeper
+1F650,tens,(winner < 12),Eliminate if the tens sum is less than 12).,56/311,keeper
+1F654,tens,(winner < 13),Eliminate if the tens sum is less than 13).,76/311,keeper
+1F660,tens,(winner < 8),Eliminate if the tens sum is less than 8).,11/311,keeper
+1F663,tens,(winner < 9),Eliminate if the tens sum is less than 9).,16/311,keeper
+1F667,tens,(winner > 35),Eliminate if the tens sum is greater than 35).,0/311,keeper
+1F669,tens,(winner > 39),Eliminate if the tens sum is greater than 39).,0/311,keeper
+1F676,tens,(winner < 12),Eliminate if the tens sum is less than 12).,56/311,keeper
+1F688,tens,(winner > 37),Eliminate if the tens sum is greater than 37).,0/311,keeper
+1F690,tens,(winner > 38),Eliminate if the tens sum is greater than 38).,0/311,keeper
+1F698,tens,(winner > 30),Eliminate if the tens sum is greater than 30).,0/311,keeper
+1F701,tens,(winner > 29),Eliminate if the tens sum is greater than 29).,0/311,keeper
+1F703,tens,(winner > 27),Eliminate if the tens sum is greater than 27).,0/311,keeper
+1F705,tens,(sum(d % 2 == 1 for d in combo_digits) == 2),Eliminate if the combo has exactly 2 odd digits.,15/311,keeper
+1F711,tens,(winner > 33),Eliminate if the tens sum is greater than 33).,0/311,keeper
+1F714,tens,(sum(d % 2 == 0 for d in combo_digits) == 1),Eliminate if the combo has exactly 1 even digit.,1/311,keeper
+1F715,tens,(sum(d % 2 == 0 for d in combo_digits) == 1),Eliminate if the combo has exactly 1 even digit.,1/311,keeper
+1F717,tens,(sum(d % 2 == 0 for d in combo_digits) == 1),Eliminate if the combo has exactly 1 even digit.,1/311,keeper
+1F718,tens,(sum(d % 2 == 1 for d in combo_digits) == 2),Eliminate if the combo has exactly 2 odd digits.,15/311,keeper
+1F719,tens,(len(set(combo_digits)) == 5 and max(combo_digits) - min(combo_digits) == 4 and len(set(combo_digits)) == 5),Eliminate if condition: (len(set(combo_digits)) == 5 and max(combo_digits) - min(combo_digits) == 4 and len(set(combo_digits)) == 5),3/311,keeper
+20F253,tens,(not (19<=winner<=25)),Eliminate if condition: (not (19<=winner<=25)),234/311,keeper
+20F259,tens,(not (11<=winner<=26)),Eliminate if condition: (not (11<=winner<=26)),42/311,keeper
+20F261,tens,(winner<16 or winner>25),Eliminate if the tens sum is greater than 25.,167/311,keeper
+20F264,tens,(winner<12 or winner>25),Eliminate if the tens sum is greater than 25.,58/311,keeper
+20F265,tens,(winner<11 or winner>26),Eliminate if the tens sum is greater than 26.,42/311,keeper
+20F268,tens,(winner<11 or winner>26),Eliminate if the tens sum is greater than 26.,42/311,keeper
+20F324,tens,(all(d<=4 for d in combo_digits)and winner_structure == 5),Eliminate if condition: (all(d<=4 for d in combo_digits)and winner_structure == 5),0/311,keeper
+20F563,tens,(len(set(combo_digits)) == 5 and len(set(combo_digits).intersection(seed_digits)) == 4),Eliminate if condition: (len(set(combo_digits)) == 5 and len(set(combo_digits).intersection(seed_digits)) == 4),20/311,keeper
+21F199,tens,"(not any(mirror.get(d,None) in combo_digits for d in seed_digits) and winner_structure == 5 and winner_structure == 5)","Eliminate if condition: (not any(mirror.get(d,None) in combo_digits for d in seed_digits) and winner_structure == 5 and winner_structure == 5)",0/311,keeper
+21F216,tens,(len(set(combo_vtracs))==5),Eliminate if condition: (len(set(combo_vtracs))==5),152/311,keeper
+22F340,tens,(sum(1 for d in combo_digits if d in seed_digits)>=3 and winner<15 and winner_structure == 5 and winner_structure == 5),Eliminate if the combo includes digits from the seed exceeding the threshold (see expression).,13/311,keeper
+22F357,tens,(prev_seed_sum > 20 and seed < 20 and winner < 20),Eliminate if the tens sum is less than 20).,222/311,keeper
+23F282,tens,(sum(1 for d in combo_digits if d in seed_digits) >=4 and winner <20 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 20.,30/311,keeper
+23F536,tens,((25 <= seed <= 33) and (0 <= winner <= 15)),Eliminate if the tens sum is less than =.,2/311,keeper
+24F554,tens,"(not any(mirror.get(d,None) in combo_digits for d in combo_digits) and all(d % 2 == 1 for d in combo_digits))","Eliminate if condition: (not any(mirror.get(d,None) in combo_digits for d in combo_digits) and all(d % 2 == 1 for d in combo_digits))",0/311,keeper
+254F555,tens,(sum(1 for d in combo_digits if mirror.get(d) in combo_digits) >= 4),Eliminate if condition: (sum(1 for d in combo_digits if mirror.get(d) in combo_digits) >= 4),262/311,keeper
+25F351,tens,(sum(1 for d in combo_digits if d in seed_digits)>=1 and winner<12 and winner_structure == 5 and winner_structure == 5),Eliminate if the combo includes digits from the seed exceeding the threshold (see expression).,6/311,keeper
+26F347,tens,(sum(1 for d in combo_digits if d in seed_digits)>=2 and winner<13 and winner_structure == 5 and winner_structure == 5),Eliminate if the combo includes digits from the seed exceeding the threshold (see expression).,9/311,keeper
+29F281,tens,(sum(1 for d in combo_digits if d in seed_digits) >=4 and winner <21 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 21.,31/311,keeper
+29F283,tens,(sum(1 for d in combo_digits if d in seed_digits) >=4 and winner <19 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 19.,26/311,keeper
+29F550DD,tens,"(any(mirror.get(d,None) in combo_digits for d in combo_digits) and sorted(Counter(combo_digits).values()) == [2, 2, 1])","Eliminate if condition: (any(mirror.get(d,None) in combo_digits for d in combo_digits) and sorted(Counter(combo_digits).values()) == [2, 2, 1])",0/311,keeper
+2F218,tens,(len(set(combo_vtracs))==1),Eliminate if condition: (len(set(combo_vtracs))==1),0/311,keeper
+2F227,tens,(winner==39 and seed<30),Eliminate if condition: (winner==39 and seed<30),0/311,keeper
+2F231,tens,(winner==8),Eliminate if condition: (winner==8),5/311,keeper
+2F234,tens,(winner==36 and seed<30),Eliminate if condition: (winner==36 and seed<30),0/311,keeper
+2F292,tens,(sum(1 for d in combo_digits if d in seed_digits) >=5 and winner <20 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 20.,30/311,keeper
+2F293,tens,(sum(1 for d in combo_digits if d in seed_digits) >=5 and winner <19 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 19.,26/311,keeper
+2F294,tens,(sum(1 for d in combo_digits if d in seed_digits) >=5 and winner <18 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 18.,25/311,keeper
+2F336,tens,(sum(1 for d in combo_digits if d in seed_digits)>=4 and winner<10 and winner_structure == 5 and winner_structure == 5 and winner_structure == 5 and winner_structure == 5),Eliminate if the combo includes digits from the seed exceeding the threshold (see expression).,2/311,keeper
+2F568,tens,(len(set(combo_digits)) == 5),Eliminate if condition: (len(set(combo_digits)) == 5),54/311,keeper
+2F576,tens,"(sorted(Counter(combo_digits).values()) == [2, 2, 1])","Eliminate if condition: (sorted(Counter(combo_digits).values()) == [2, 2, 1])",0/311,keeper
+2F581,tens,(3 in Counter(combo_digits).values()),Eliminate if condition: (3 in Counter(combo_digits).values()),167/311,keeper
+2F584,tens,(3 in Counter(combo_digits).values()),Eliminate if condition: (3 in Counter(combo_digits).values()),167/311,keeper
+2F586,tens,"(sorted(Counter(combo_digits).values()) == [2, 2, 1])","Eliminate if condition: (sorted(Counter(combo_digits).values()) == [2, 2, 1])",0/311,keeper
+2F591,tens,(3 in Counter(combo_digits).values()),Eliminate if condition: (3 in Counter(combo_digits).values()),167/311,keeper
+2F592,tens,"(sorted(Counter(combo_digits).values()) == [2, 2, 1])","Eliminate if condition: (sorted(Counter(combo_digits).values()) == [2, 2, 1])",0/311,keeper
+2F593,tens,"(sorted(Counter(combo_digits).values()) == [2, 2, 1])","Eliminate if condition: (sorted(Counter(combo_digits).values()) == [2, 2, 1])",0/311,keeper
+2F597,tens,"(sorted(Counter(combo_digits).values()) == [2, 2, 1])","Eliminate if condition: (sorted(Counter(combo_digits).values()) == [2, 2, 1])",0/311,keeper
+2F599,tens,"(sorted(Counter(combo_digits).values()) == [2, 2, 1])","Eliminate if condition: (sorted(Counter(combo_digits).values()) == [2, 2, 1])",0/311,keeper
+2F602,tens,"(sorted(Counter(combo_digits).values()) == [2, 2, 1])","Eliminate if condition: (sorted(Counter(combo_digits).values()) == [2, 2, 1])",0/311,keeper
+2F607,tens,(3 in Counter(combo_digits).values()),Eliminate if condition: (3 in Counter(combo_digits).values()),167/311,keeper
+2F609,tens,"(sorted(Counter(combo_digits).values()) == [2, 2, 1])","Eliminate if condition: (sorted(Counter(combo_digits).values()) == [2, 2, 1])",0/311,keeper
+2F614,tens,"(sorted(Counter(combo_digits).values()) == [2, 2, 1])","Eliminate if condition: (sorted(Counter(combo_digits).values()) == [2, 2, 1])",0/311,keeper
+2F615,tens,(3 in Counter(combo_digits).values()),Eliminate if condition: (3 in Counter(combo_digits).values()),167/311,keeper
+2F619,tens,(3 in Counter(combo_digits).values()),Eliminate if condition: (3 in Counter(combo_digits).values()),167/311,keeper
+2F629,tens,(winner < 13),Eliminate if the tens sum is less than 13).,76/311,keeper
+2F630,tens,(winner < 12),Eliminate if the tens sum is less than 12).,56/311,keeper
+2F632,tens,(sum(d % 2 == 0 for d in combo_digits) == 1),Eliminate if the combo has exactly 1 even digit.,1/311,keeper
+2F635,tens,(winner < 18),Eliminate if the tens sum is less than 18).,218/311,keeper
+2F636,tens,(winner > 32),Eliminate if the tens sum is greater than 32).,0/311,keeper
+2F644,tens,(winner < 10),Eliminate if the tens sum is less than 10).,26/311,keeper
+2F646,tens,(winner < 9),Eliminate if the tens sum is less than 9).,16/311,keeper
+2F648,tens,(winner < 13),Eliminate if the tens sum is less than 13).,76/311,keeper
+2F649,tens,(winner > 33),Eliminate if the tens sum is greater than 33).,0/311,keeper
+2F653,tens,(winner > 31),Eliminate if the tens sum is greater than 31).,0/311,keeper
+2F655,tens,(winner > 32),Eliminate if the tens sum is greater than 32).,0/311,keeper
+2F657,tens,(winner > 40),Eliminate if the tens sum is greater than 40).,0/311,keeper
+2F659,tens,(winner > 35),Eliminate if the tens sum is greater than 35).,0/311,keeper
+2F661,tens,(winner > 37),Eliminate if the tens sum is greater than 37).,0/311,keeper
+2F664,tens,(winner > 37),Eliminate if the tens sum is greater than 37).,0/311,keeper
+2F671,tens,(winner > 37),Eliminate if the tens sum is greater than 37).,0/311,keeper
+2F674,tens,(winner > 31),Eliminate if the tens sum is greater than 31).,0/311,keeper
+2F679,tens,(winner > 34),Eliminate if the tens sum is greater than 34).,0/311,keeper
+2F680,tens,(winner > 36),Eliminate if the tens sum is greater than 36).,0/311,keeper
+2F685,tens,(winner > 33),Eliminate if the tens sum is greater than 33).,0/311,keeper
+2F692,tens,(winner > 35),Eliminate if the tens sum is greater than 35).,0/311,keeper
+2F695,tens,(sum(d % 2 == 1 for d in combo_digits) == 2),Eliminate if the combo has exactly 2 odd digits.,15/311,keeper
+2F707,tens,(winner > 31),Eliminate if the tens sum is greater than 31).,0/311,keeper
+2F709,tens,(winner > 35),Eliminate if the tens sum is greater than 35).,0/311,keeper
+31F323,tens,(all(d>=5 for d in combo_digits)),Eliminate if condition: (all(d>=5 for d in combo_digits)),0/311,keeper
+32F339,tens,(sum(1 for d in combo_digits if d in seed_digits)>=3 and winner<16 and winner_structure == 5 and winner_structure == 5),Eliminate if the combo includes digits from the seed exceeding the threshold (see expression).,19/311,keeper
+32F532,tens,((16 <= seed <= 24) and (34 <= winner <= 45)),Eliminate if the tens sum is less than =.,0/311,keeper
+33F245,tens,"(any(set(range(n,n+4)).issubset(set(combo_digits)) for n in range(7))and winner_structure == 5 and winner_structure == 5)","Eliminate if condition: (any(set(range(n,n+4)).issubset(set(combo_digits)) for n in range(7))and winner_structure == 5 and winner_structure == 5)",8/311,keeper
+346F551,tens,"(any(mirror.get(d,None) in combo_digits for d in combo_digits) and not all(d % 2 == 1 for d in combo_digits))","Eliminate if condition: (any(mirror.get(d,None) in combo_digits for d in combo_digits) and not all(d % 2 == 1 for d in combo_digits))",305/311,keeper
+34F284,tens,(sum(1 for d in combo_digits if d in seed_digits) >=4 and winner <18 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 18.,25/311,keeper
+35F346,tens,(sum(1 for d in combo_digits if d in seed_digits)>=2 and winner<14 and winner_structure == 5 and winner_structure == 5),Eliminate if the combo includes digits from the seed exceeding the threshold (see expression).,9/311,keeper
+37F285,tens,(sum(1 for d in combo_digits if d in seed_digits) >=4 and winner <17 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 17.,24/311,keeper
+39F286,tens,(sum(1 for d in combo_digits if d in seed_digits) >=4 and winner <16 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 16.,19/311,keeper
+3F187,tens,(any(v >=4 for v in Counter(combo_digits).values())),Eliminate if condition: (any(v >=4 for v in Counter(combo_digits).values())),47/311,keeper
+3F209,tens,(winner <10 or winner >29),Eliminate if the tens sum is greater than 29).,26/311,keeper
+3F211,tens,(winner <7 or winner >26),Eliminate if the tens sum is greater than 26).,4/311,keeper
+3F232,tens,(winner==7),Eliminate if condition: (winner==7),7/311,keeper
+3F233,tens,(winner==6),Eliminate if condition: (winner==6),2/311,keeper
+3F291,tens,(sum(1 for d in combo_digits if d in seed_digits) >=5 and winner <21 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 21.,31/311,keeper
+3F572,tens,(3 in Counter(combo_digits).values()),Eliminate if condition: (3 in Counter(combo_digits).values()),167/311,keeper
+3F580,tens,"(sorted(Counter(combo_digits).values()) == [2, 2, 1])","Eliminate if condition: (sorted(Counter(combo_digits).values()) == [2, 2, 1])",0/311,keeper
+3F585,tens,"(sorted(Counter(combo_digits).values()) == [2, 2, 1])","Eliminate if condition: (sorted(Counter(combo_digits).values()) == [2, 2, 1])",0/311,keeper
+3F588,tens,(3 in Counter(combo_digits).values()),Eliminate if condition: (3 in Counter(combo_digits).values()),167/311,keeper
+3F598,tens,(3 in Counter(combo_digits).values()),Eliminate if condition: (3 in Counter(combo_digits).values()),167/311,keeper
+3F600,tens,(3 in Counter(combo_digits).values()),Eliminate if condition: (3 in Counter(combo_digits).values()),167/311,keeper
+3F604,tens,(3 in Counter(combo_digits).values()),Eliminate if condition: (3 in Counter(combo_digits).values()),167/311,keeper
+3F640,tens,(sum(d % 2 == 0 for d in combo_digits) == 1),Eliminate if the combo has exactly 1 even digit.,1/311,keeper
+3F641,tens,(winner < 14),Eliminate if the tens sum is less than 14).,101/311,keeper
+3F651,tens,(winner > 36),Eliminate if the tens sum is greater than 36).,0/311,keeper
+3F677,tens,(winner > 34),Eliminate if the tens sum is greater than 34).,0/311,keeper
+3F683,tens,(winner > 36),Eliminate if the tens sum is greater than 36).,0/311,keeper
+3F708,tens,(winner > 23),Eliminate if the tens sum is greater than 23).,5/311,keeper
+40F198,tens,(not any(d in cold_digits for d in combo_digits)),Eliminate if condition: (not any(d in cold_digits for d in combo_digits)),59/311,keeper
+42F356,tens,(winner%2==0),Eliminate if condition: (winner%2==0),148/311,keeper
+44F287,tens,(sum(1 for d in combo_digits if d in seed_digits) >=4 and winner <25 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 25.,31/311,keeper
+45F541,tens,(winner_structure == 5),Eliminate if condition: (winner_structure == 5),32/311,keeper
+47F338,tens,(sum(1 for d in combo_digits if d in seed_digits)>=3 and winner<17 and winner_structure == 5 and winner_structure == 5),Eliminate if the combo includes digits from the seed exceeding the threshold (see expression).,24/311,keeper
+4F090,tens,(winner % 10 == 3),Eliminate if the tens sum ends with 3.,34/311,keeper
+4F228,tens,(winner==40 and seed<30),Eliminate if condition: (winner==40 and seed<30),0/311,keeper
+4F230,tens,(winner==9),Eliminate if condition: (winner==9),10/311,keeper
+4F312,tens,(sum(1 for d in combo_digits if d in seed_digits) >=4 and winner <12 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 12.,6/311,keeper
+4F313,tens,(sum(1 for d in combo_digits if d in seed_digits) >=4 and winner <11 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 11.,5/311,keeper
+4F565,tens,(len(set(combo_digits).intersection(seed_digits)) > 1),Eliminate if the combo shares more than 1 digits with the seed.,311/311,keeper
+4F575,tens,(3 in Counter(combo_digits).values()),Eliminate if condition: (3 in Counter(combo_digits).values()),167/311,keeper
+4F618,tens,(len(set(combo_digits)) == 5),Eliminate if condition: (len(set(combo_digits)) == 5),54/311,keeper
+4F626,tens,(sum(d % 2 == 0 for d in combo_digits) == 1),Eliminate if the combo has exactly 1 even digit.,1/311,keeper
+4F628,tens,(winner > 25),Eliminate if the tens sum is greater than 25).,2/311,keeper
+50F254,tens,(not (16<=winner<=25)),Eliminate if condition: (not (16<=winner<=25)),167/311,keeper
+52F288,tens,(sum(1 for d in combo_digits if d in seed_digits) >=4 and winner <36 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 36.,32/311,keeper
+54F289,tens,(sum(1 for d in combo_digits if d in seed_digits) >=4 and winner <37 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 37.,32/311,keeper
+56F337,tens,(sum(1 for d in combo_digits if d in seed_digits)>=3 and winner<18 and winner_structure == 5 and winner_structure == 5),Eliminate if the combo includes digits from the seed exceeding the threshold (see expression).,25/311,keeper
+58F335,tens,"(not any(mirror.get(d,-1) in combo_digits for d in seed_digits) and winner_structure == 5 and winner_structure == 5)","Eliminate if condition: (not any(mirror.get(d,-1) in combo_digits for d in seed_digits) and winner_structure == 5 and winner_structure == 5)",0/311,keeper
+59F255,tens,(not (14<=winner<=24)),Eliminate if condition: (not (14<=winner<=24)),104/311,keeper
+59F262,tens,(winner<14 or winner>24),Eliminate if the tens sum is greater than 24.,104/311,keeper
+59F332,tens,(winner<14 or winner>24),Eliminate if the tens sum is greater than 24.,104/311,keeper
+5F559,tens,"(sorted(Counter(combo_digits).values()) == [2, 3] and any(d in mirror.values() for d in combo_digits) and sum(d <= 4 for d in combo_digits) < 4)","Eliminate if condition: (sorted(Counter(combo_digits).values()) == [2, 3] and any(d in mirror.values() for d in combo_digits) and sum(d <= 4 for d in combo_digits) < 4)",0/311,keeper
+5F566,tens,(len(set(combo_digits).intersection(seed_digits)) > 2),Eliminate if the combo shares more than 2 digits with the seed.,298/311,keeper
+5F569,tens,(len(set(combo_digits).intersection(seed_digits)) >= 3),Eliminate if the combo shares at least 3 digits with the seed.,298/311,keeper
+5F570,tens,(list(Counter(combo_digits).values()).count(2) + list(Counter(combo_digits).values()).count(3) > 1),Eliminate if condition: (list(Counter(combo_digits).values()).count(2) + list(Counter(combo_digits).values()).count(3) > 1),271/311,keeper
+5F577,tens,(3 in Counter(combo_digits).values()),Eliminate if condition: (3 in Counter(combo_digits).values()),167/311,keeper
+5F578,tens,(3 in Counter(combo_digits).values()),Eliminate if condition: (3 in Counter(combo_digits).values()),167/311,keeper
+5F624,tens,(sum(d % 2 == 0 for d in combo_digits) == 2),Eliminate if the combo has exactly 2 even digits.,5/311,keeper
+63F186,tens,(any(v >=3 for v in Counter(combo_digits).values())),Eliminate if condition: (any(v >=3 for v in Counter(combo_digits).values())),204/311,keeper
+63F224,tens,"(not any(d in combo_digits for d in [1,3,5]))","Eliminate if condition: (not any(d in combo_digits for d in [1,3,5]))",1/311,keeper
+63F275,tens,(sum(1 for d in combo_digits if d in seed_digits) >=4 and winner <28 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 28.,32/311,keeper
+63F280,tens,(sum(1 for d in combo_digits if d in seed_digits) >=4 and winner <22 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 22.,31/311,keeper
+67F274,tens,(sum(1 for d in combo_digits if d in seed_digits) >=4 and winner <29 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 29.,32/311,keeper
+67F279,tens,(sum(1 for d in combo_digits if d in seed_digits) >=4 and winner <24 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 24.,31/311,keeper
+6F058,tens,(winner % 10 == 8),Eliminate if the tens sum ends with 8.,19/311,keeper
+6F205,tens,(winner <8 or winner >28),Eliminate if the tens sum is greater than 28).,11/311,keeper
+6F257,tens,(not (12<=winner<=25)),Eliminate if condition: (not (12<=winner<=25)),58/311,keeper
+6F266,tens,(winner%10==0),Eliminate if the tens sum ends with 0.,34/311,keeper
+6F311,tens,(sum(1 for d in combo_digits if d in seed_digits) >=4 and winner <13 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 13.,9/311,keeper
+6F321,tens,(not any(d in cold_digits for d in combo_digits)),Eliminate if condition: (not any(d in cold_digits for d in combo_digits)),59/311,keeper
+6F560,tens,(len(set(combo_digits).intersection(seed_digits)) == 1 and winner < 14),Eliminate if the tens sum is less than 14).,0/311,keeper
+70F270,tens,(sum(1 for d in combo_digits if d in seed_digits) >=4 and winner <33 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 33.,32/311,keeper
+70F273,tens,(sum(1 for d in combo_digits if d in seed_digits) >=4 and winner <30 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 30.,32/311,keeper
+70F278,tens,(sum(1 for d in combo_digits if d in seed_digits) >=4 and winner <26 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 26.,31/311,keeper
+71F190,tens,(int(str(winner)[-1]) == int(str(seed)[0])),Eliminate if condition: (int(str(winner)[-1]) == int(str(seed)[0])),24/311,keeper
+71F220,tens,"(not any(d in combo_digits for d in [2,3,4]))","Eliminate if condition: (not any(d in combo_digits for d in [2,3,4]))",1/311,keeper
+71F249,tens,(1 not in combo_digits and 2 not in combo_digits and 3 not in combo_digits),Eliminate if condition: (1 not in combo_digits and 2 not in combo_digits and 3 not in combo_digits),2/311,keeper
+71F250,tens,(2 not in combo_digits and 3 not in combo_digits and 4 not in combo_digits),Eliminate if condition: (2 not in combo_digits and 3 not in combo_digits and 4 not in combo_digits),1/311,keeper
+74F269,tens,(sum(1 for d in combo_digits if d in seed_digits) >=4 and winner <34 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 34.,32/311,keeper
+74F272,tens,(sum(1 for d in combo_digits if d in seed_digits) >=4 and winner <31 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 31.,32/311,keeper
+74F277,tens,(sum(1 for d in combo_digits if d in seed_digits) >=4 and winner <35 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 35.,32/311,keeper
+75F271,tens,(sum(1 for d in combo_digits if d in seed_digits) >=4 and winner <32 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 32.,32/311,keeper
+75F276,tens,(sum(1 for d in combo_digits if d in seed_digits) >=4 and winner <27 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 27.,32/311,keeper
+76F309,tens,(sum(1 for d in combo_digits if d in seed_digits) >=4 and winner <39 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 39.,32/311,keeper
+77F308,tens,(sum(1 for d in combo_digits if d in seed_digits) >=4 and winner <40 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 40.,32/311,keeper
+78F221,tens,"(not any(d in combo_digits for d in [1,2,3]))","Eliminate if condition: (not any(d in combo_digits for d in [1,2,3]))",2/311,keeper
+78F303,tens,(sum(1 for d in combo_digits if d in seed_digits) >=4 and winner <45 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 45.,32/311,keeper
+78F304,tens,(sum(1 for d in combo_digits if d in seed_digits) >=4 and winner <44 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 44.,32/311,keeper
+78F305,tens,(sum(1 for d in combo_digits if d in seed_digits) >=4 and winner <43 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 43.,32/311,keeper
+78F306,tens,(sum(1 for d in combo_digits if d in seed_digits) >=4 and winner <42 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 42.,32/311,keeper
+78F307,tens,(sum(1 for d in combo_digits if d in seed_digits) >=4 and winner <41 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 41.,32/311,keeper
+7F059,tens,(winner % 10 == 8),Eliminate if the tens sum ends with 8.,19/311,keeper
+7F179,tens,(winner % 10 == 1),Eliminate if the tens sum ends with 1.,23/311,keeper
+7F573,tens,(len(set(combo_digits).intersection(seed_digits)) == 1),Eliminate if condition: (len(set(combo_digits).intersection(seed_digits)) == 1),0/311,keeper
+7F623,tens,(winner < 20),Eliminate if the tens sum is less than 20).,263/311,keeper
+81F251,tens,(5 not in combo_digits and 4 not in combo_digits),Eliminate if condition: (5 not in combo_digits and 4 not in combo_digits),20/311,keeper
+87F722,tens,(len(set(seed_digits_1).intersection(seed_digits_2).intersection(combo_digits)) >= 2),Eliminate if condition: (len(set(seed_digits_1).intersection(seed_digits_2).intersection(combo_digits)) >= 2),0/311,keeper
+8F060,tens,(winner % 10 == 7),Eliminate if the tens sum ends with 7.,30/311,keeper
+8F226,tens,(winner==10),Eliminate if condition: (winner==10),16/311,keeper
+8F344,tens,(sum(1 for d in combo_digits if d in seed_digits)>=3 and winner<11 and winner_structure == 5 and winner_structure == 5),Eliminate if the combo includes digits from the seed exceeding the threshold (see expression).,5/311,keeper
+8F345,tens,(sum(1 for d in combo_digits if d in seed_digits)>=3 and winner<10 and winner_structure == 5 and winner_structure == 5),Eliminate if the combo includes digits from the seed exceeding the threshold (see expression).,2/311,keeper
+8F562,tens,(len(set(combo_digits).intersection(seed_digits)) == 1 and all(d % 2 == 1 for d in combo_digits)),Eliminate if condition: (len(set(combo_digits).intersection(seed_digits)) == 1 and all(d % 2 == 1 for d in combo_digits)),0/311,keeper
+8F574,tens,(len(set(combo_digits).intersection(seed_digits)) == 1),Eliminate if condition: (len(set(combo_digits).intersection(seed_digits)) == 1),0/311,keeper
+91F180,tens,(sum(1 for d in combo_digits if d in seed_digits) >=5 and winner <22 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 22.,31/311,keeper
+9F343,tens,(sum(1 for d in combo_digits if d in seed_digits)>=3 and winner<12 and winner_structure == 5 and winner_structure == 5),Eliminate if the combo includes digits from the seed exceeding the threshold (see expression).,6/311,keeper
+9F350,tens,(sum(1 for d in combo_digits if d in seed_digits)>=2 and winner<10 and winner_structure == 5 and winner_structure == 5),Eliminate if the combo includes digits from the seed exceeding the threshold (see expression).,2/311,keeper
+9F571,tens,(len(set(combo_digits).intersection(seed_digits)) == 1),Eliminate if condition: (len(set(combo_digits).intersection(seed_digits)) == 1),0/311,keeper
+F723,tens,(str(winner)[-1] == str(seed)[-1]),Eliminate if condition: (str(winner)[-1] == str(seed)[-1]),33/311,keeper
+F724,tens,(((seed % 9 or 9) % 3 == 0) and (((seed % 9 or 9) // 3) in combo_digits)),Eliminate if condition: (((seed % 9 or 9) % 3 == 0) and (((seed % 9 or 9) // 3) in combo_digits)),61/311,keeper
+F724C,tens,((((seed % 9 or 9) % 3 == 0) and (((seed % 9 or 9) // 3) in combo_digits))),Eliminate if condition: ((((seed % 9 or 9) % 3 == 0) and (((seed % 9 or 9) // 3) in combo_digits))),61/311,keeper
+F725,tens,((winner % 9 or 9) == (seed % 9 or 9)),Eliminate if condition: ((winner % 9 or 9) == (seed % 9 or 9)),35/311,keeper
+F726,tens,(max(seed_digits) - min(seed_digits) == (winner % 9 or 9)),Eliminate if condition: (max(seed_digits) - min(seed_digits) == (winner % 9 or 9)),27/311,keeper
+F727,tens,"((abs(winner - round((seed**0.5) * 1.5, 2)) <= 2))","Eliminate if condition: ((abs(winner - round((seed**0.5) * 1.5, 2)) <= 2))",11/311,keeper
+F728,tens,"((abs(winner - round((seed**0.5) * 2.0, 2)) <= 2))","Eliminate if condition: ((abs(winner - round((seed**0.5) * 2.0, 2)) <= 2))",35/311,keeper
+F729,tens,"((abs(winner - round((seed**0.5) * 2.5, 2)) <= 2))","Eliminate if condition: ((abs(winner - round((seed**0.5) * 2.5, 2)) <= 2))",55/311,keeper
+F730,tens,"((abs(winner - round((seed**0.5) * 3.0, 2)) <= 2))","Eliminate if condition: ((abs(winner - round((seed**0.5) * 3.0, 2)) <= 2))",74/311,keeper
+N015F538,tens,((0 <= seed <= 15) and (0 <= winner <= 15)),Eliminate if the tens sum is less than =.,86/311,keeper
+NEWF725,tens,(5 not in combo_digits and 8 not in combo_digits and 5 not in combo_digits),Eliminate if condition: (5 not in combo_digits and 8 not in combo_digits and 5 not in combo_digits),57/311,keeper
+NO101F189,tens,(not any(d in due_digits for d in combo_digits)),Eliminate if condition: (not any(d in due_digits for d in combo_digits)),104/311,keeper
+NO101F316R,tens,(abs(winner - seed) > 13),Eliminate if condition: (abs(winner - seed) > 13),5/311,keeper
+NO110F721,tens,(len(set(combo_digits) & set(seed_digits)) > 2),Eliminate if condition: (len(set(combo_digits) & set(seed_digits)) > 2),298/311,keeper
+NO114F248,tens,(5 not in combo_digits and 4 not in combo_digits),Eliminate if condition: (5 not in combo_digits and 4 not in combo_digits),20/311,keeper
+NO118F322,tens,(abs((max(combo_digits)-min(combo_digits)) - (max(seed_digits)-min(seed_digits)))>3),Eliminate if condition: (abs((max(combo_digits)-min(combo_digits)) - (max(seed_digits)-min(seed_digits)))>3),13/311,keeper
+NO123F252,tens,(not (20<=winner<=28)),Eliminate if condition: (not (20<=winner<=28)),263/311,keeper
+NO124F181,tens,(25 <= winner <= 33),Eliminate if the tens sum is less than =.,3/311,keeper
+NO124F539,tens,(not any(d in hot_digits for d in combo_digits)),Eliminate if condition: (not any(d in hot_digits for d in combo_digits)),68/311,keeper
+NO135F215,tens,(all(v in combo_vtracs for v in seed_vtracs)),Eliminate if condition: (all(v in combo_vtracs for v in seed_vtracs)),168/311,keeper
+NO139F202,tens,(all(d >=3 for d in combo_digits)),Eliminate if condition: (all(d >=3 for d in combo_digits)),0/311,keeper
+NO142F551D,tens,"(not any(mirror.get(d,None) in combo_digits for d in combo_digits))","Eliminate if condition: (not any(mirror.get(d,None) in combo_digits for d in combo_digits))",6/311,keeper
+NO15F188,tens,"(winner == sum(mirror.get(int(x),int(x)) for x in str(seed)))","Eliminate if the tens sum equals sum(mirror.get(int(x),int(x)) for x in str(seed))).",17/311,keeper
+NO16F333,tens,"(winner==sum(mirror.get(int(x),int(x)) for x in str(seed)))","Eliminate if condition: (winner==sum(mirror.get(int(x),int(x)) for x in str(seed)))",17/311,keeper
+NO172F550S,tens,"(any(mirror.get(d,None) in combo_digits for d in combo_digits) and sum(1 for d in combo_digits if d <= 4) < 4)","Eliminate if condition: (any(mirror.get(d,None) in combo_digits for d in combo_digits) and sum(1 for d in combo_digits if d <= 4) < 4)",9/311,keeper
+NO177F318,tens,(sum(d%2 for d in combo_digits)==sum(d%2 for d in seed_digits)),Eliminate if condition: (sum(d%2 for d in combo_digits)==sum(d%2 for d in seed_digits)),65/311,keeper
+NO177F319,tens,(5 - sum(d%2 for d in combo_digits) == 5 - sum(d%2 for d in seed_digits)),Eliminate if condition: (5 - sum(d%2 for d in combo_digits) == 5 - sum(d%2 for d in seed_digits)),65/311,keeper
+NO177F547,tens,(sum(d in due_digits for d in combo_digits) > 2),Eliminate if condition: (sum(d in due_digits for d in combo_digits) > 2),49/311,keeper
+NO188F540,tens,(sum(d in hot_digits for d in combo_digits) < 2),Eliminate if condition: (sum(d in hot_digits for d in combo_digits) < 2),161/311,keeper
+NO204F203,tens,(sum(1 for d in combo_digits if d >=8) >=2),Eliminate if condition: (sum(1 for d in combo_digits if d >=8) >=2),84/311,keeper
+NO20F329,tens,(winner<12 or winner>25),Eliminate if the tens sum is greater than 25.,58/311,keeper
+NO21F551S,tens,"(len(set(combo_digits)) == 5 and not any(mirror.get(d,None) in combo_digits for d in combo_digits))","Eliminate if condition: (len(set(combo_digits)) == 5 and not any(mirror.get(d,None) in combo_digits for d in combo_digits))",6/311,keeper
+NO25F556,tens,(len(set(combo_digits)) > 3 and all(d not in mirror.values() for d in combo_digits) and (max(combo_digits) - min(combo_digits) <= 4)),Eliminate if the spread (highest minus lowest digit) is 4 or less.,0/311,keeper
+NO262F184,tens,"(not any(mirror.get(d, None) in combo_digits for d in combo_digits))","Eliminate if condition: (not any(mirror.get(d, None) in combo_digits for d in combo_digits))",6/311,keeper
+NO27F535,tens,((16 <= seed <= 24) and (0 <= winner <= 15)),Eliminate if the tens sum is less than =.,77/311,keeper
+NO296F355,tens,"(any(d == mirror.get(int(str(seed)[-1]),-1) for d in combo_digits))","Eliminate if condition: (any(d == mirror.get(int(str(seed)[-1]),-1) for d in combo_digits))",211/311,keeper
+NO296F549,tens,"(any(mirror.get(d,None) in combo_digits for d in combo_digits) and max(combo_digits) - min(combo_digits) > 4)","Eliminate if condition: (any(mirror.get(d,None) in combo_digits for d in combo_digits) and max(combo_digits) - min(combo_digits) > 4)",305/311,keeper
+NO30F256,tens,(not (14<=winner<=22)),Eliminate if condition: (not (14<=winner<=22)),115/311,keeper
+NO30F263,tens,(winner<14 or winner>22),Eliminate if the tens sum is greater than 22.,115/311,keeper
+NO30F267,tens,(winner<14 or winner>22),Eliminate if the tens sum is greater than 22.,115/311,keeper
+NO30F326,tens,(all(d%2==0 for d in combo_digits)),Eliminate if condition: (all(d%2==0 for d in combo_digits)),0/311,keeper
+NO33F182,tens,(winner <= 15),Eliminate if the tens sum is less than =.,165/311,keeper
+NO35F260,tens,(winner<19 or winner>25),Eliminate if the tens sum is greater than 25.,234/311,keeper
+NO35F327,tens,(winner<19 or winner>25),Eliminate if the tens sum is greater than 25.,234/311,keeper
+NO35F330,tens,(winner<19 or winner>25),Eliminate if the tens sum is greater than 25.,234/311,keeper
+NO367F550,tens,"(any(mirror.get(d,None) in combo_digits for d in combo_digits) and sum(1 for d in combo_digits if d <= 4) < 4)","Eliminate if condition: (any(mirror.get(d,None) in combo_digits for d in combo_digits) and sum(1 for d in combo_digits if d <= 4) < 4)",9/311,keeper
+NO41F553,tens,"(not any(mirror.get(d,None) in combo_digits for d in combo_digits) and sum(1 for d in combo_digits if d <= 4) >= 4)","Eliminate if condition: (not any(mirror.get(d,None) in combo_digits for d in combo_digits) and sum(1 for d in combo_digits if d <= 4) >= 4)",6/311,keeper
+NO44F320,tens,(winner>25 and sum(1 for d in combo_digits if d in seed_digits)<3),Eliminate if the combo includes digits from the seed exceeding the threshold (see expression).,0/311,keeper
+NO467F354,tens,"(any(mirror.get(d,-1) in combo_digits for d in combo_digits))","Eliminate if condition: (any(mirror.get(d,-1) in combo_digits for d in combo_digits))",305/311,keeper
+NO4F225,tens,(winner==37 and seed<30),Eliminate if condition: (winner==37 and seed<30),0/311,keeper
+NO50F331,tens,(winner<16 or winner>25),Eliminate if the tens sum is greater than 25.,167/311,keeper
+NO55F290,tens,(sum(1 for d in combo_digits if d in seed_digits) >=4 and winner <38 and winner_structure == 5 and winner_structure == 5),Eliminate if the tens sum is less than 38.,32/311,keeper
+NO659F314,tens,(abs(winner - seed) <=15),Eliminate if condition: (abs(winner - seed) <=15),311/311,keeper
+NO67F317,tens,(sum(int(d) for d in str(winner)) == sum(int(d) for d in str(seed))),Eliminate if condition: (sum(int(d) for d in str(winner)) == sum(int(d) for d in str(seed))),31/311,keeper
+NO69F314R,tens,(abs(winner - seed) > 15),Eliminate if condition: (abs(winner - seed) > 15),0/311,keeper
+NO6F191,tens,(winner <8 or winner >28),Eliminate if the tens sum is greater than 28).,11/311,keeper
+NO70F315R,tens,(abs(winner - seed) > 14),Eliminate if condition: (abs(winner - seed) > 14),1/311,keeper
+NO71F201,tens,(1 not in combo_digits and 2 not in combo_digits and 3 not in combo_digits),Eliminate if condition: (1 not in combo_digits and 2 not in combo_digits and 3 not in combo_digits),2/311,keeper
+NO75F196,tens,"(not any(d in combo_digits for d in [1,2,3]))","Eliminate if condition: (not any(d in combo_digits for d in [1,2,3]))",2/311,keeper
+NO78F720,tens,(sum(1 for d in combo_digits if d in seed_digits) > 3),Eliminate if the combo includes digits from the seed exceeding the threshold (see expression).,303/311,keeper
+NO81F217,tens,(len(set(combo_vtracs))<=2),Eliminate if condition: (len(set(combo_vtracs))<=2),0/311,keeper
+NO82F185,tens,"(len(set(combo_digits)) == 3 and sorted(Counter(combo_digits).values())==[1,2,2])","Eliminate if condition: (len(set(combo_digits)) == 3 and sorted(Counter(combo_digits).values())==[1,2,2])",0/311,keeper
+NO9F244,tens,(winner==34 and seed<30),Eliminate if condition: (winner==34 and seed<30),0/311,keeper
+NVR290F200,tens,"(any(d == mirror.get(int(str(seed)[-1]),-1) for d in combo_digits))","Eliminate if condition: (any(d == mirror.get(int(str(seed)[-1]),-1) for d in combo_digits))",211/311,keeper
+NVR617F316,tens,(abs(winner - seed) <=13),Eliminate if condition: (abs(winner - seed) <=13),306/311,keeper
+NVR643F315,tens,(abs(winner - seed) <=14),Eliminate if condition: (abs(winner - seed) <=14),310/311,keeper
+Nvr390F548,tens,"(any(mirror.get(d,None) in combo_digits for d in combo_digits))","Eliminate if condition: (any(mirror.get(d,None) in combo_digits for d in combo_digits))",305/311,keeper
+REV_123F328_tens,tens,(winner>=20 or winner<=28),Eliminate if condition: (winner>=20 or winner<=28),263/311,reversed
+REV_142F213_tens,tens,(winner >=25 and sum(1 for d in combo_digits if d in seed_digits) <3),Eliminate if the tens sum is greater than =25.,306/311,reversed
+REV_1F605_tens,tens,(len(set(combo_digits).intersection(seed_digits)) <= 3),Eliminate if condition: (len(set(combo_digits).intersection(seed_digits)) <= 3),242/311,reversed
+REV_1F606_tens,tens,(len(set(combo_digits).intersection(seed_digits)) <= 3),Eliminate if condition: (len(set(combo_digits).intersection(seed_digits)) <= 3),242/311,reversed
+REV_1F617_tens,tens,(len(set(combo_digits).intersection(seed_digits)) <= 3),Eliminate if condition: (len(set(combo_digits).intersection(seed_digits)) <= 3),242/311,reversed
+REV_20F253_tens,tens,(not (19>winner>25)),Eliminate if the tens sum is greater than 25.,234/311,reversed
+REV_254F555_tens,tens,(sum(1 for d in combo_digits if mirror.get(d) in combo_digits) < 4),Eliminate if condition: (sum(1 for d in combo_digits if mirror.get(d) in combo_digits) < 4),262/311,reversed
+REV_346F551_tens,tens,"(any(mirror.get(d,None) in combo_digits for d in combo_digits) and not all(d % 2 != 1 for d in combo_digits))","Eliminate if condition: (any(mirror.get(d,None) in combo_digits for d in combo_digits) and not all(d % 2 != 1 for d in combo_digits))",305/311,reversed
+REV_4F565_tens,tens,(len(set(combo_digits).intersection(seed_digits)) <= 1),Eliminate if condition: (len(set(combo_digits).intersection(seed_digits)) <= 1),311/311,reversed
+REV_5F566_tens,tens,(len(set(combo_digits).intersection(seed_digits)) <= 2),Eliminate if condition: (len(set(combo_digits).intersection(seed_digits)) <= 2),298/311,reversed
+REV_5F569_tens,tens,(len(set(combo_digits).intersection(seed_digits)) < 3),Eliminate if condition: (len(set(combo_digits).intersection(seed_digits)) < 3),298/311,reversed
+REV_5F570_tens,tens,(list(Counter(combo_digits).values()).count(2) + list(Counter(combo_digits).values()).count(3) <= 1),Eliminate if condition: (list(Counter(combo_digits).values()).count(2) + list(Counter(combo_digits).values()).count(3) <= 1),271/311,reversed
+REV_7F623_tens,tens,(winner >= 20),Eliminate if the tens sum is greater than =.,263/311,reversed
+REV_NO110F721_tens,tens,(len(set(combo_digits) & set(seed_digits)) <= 2),Eliminate if condition: (len(set(combo_digits) & set(seed_digits)) <= 2),298/311,reversed
+REV_NO123F252_tens,tens,(not (20>winner>28)),Eliminate if the tens sum is greater than 28.,263/311,reversed
+REV_NO296F549_tens,tens,"(any(mirror.get(d,None) in combo_digits for d in combo_digits) and max(combo_digits) - min(combo_digits) <= 4)",Eliminate if the spread (highest minus lowest digit) is 4 or less.,305/311,reversed
+REV_NO35F260_tens,tens,(winner>=19 or winner<=25),Eliminate if condition: (winner>=19 or winner<=25),234/311,reversed
+REV_NO35F327_tens,tens,(winner>=19 or winner<=25),Eliminate if condition: (winner>=19 or winner<=25),234/311,reversed
+REV_NO35F330_tens,tens,(winner>=19 or winner<=25),Eliminate if condition: (winner>=19 or winner<=25),234/311,reversed
+REV_NO467F354_tens,tens,"(any(mirror.get(d,-1) in combo_digits for d in combo_digits))","Eliminate if condition: (any(mirror.get(d,-1) in combo_digits for d in combo_digits))",305/311,reversed
+REV_NO659F314_tens,tens,(abs(winner - seed) >15),Eliminate if condition: (abs(winner - seed) >15),311/311,reversed
+REV_NO78F720_tens,tens,(sum(1 for d in combo_digits if d in seed_digits) <= 3),Eliminate if the combo includes digits from the seed exceeding the threshold (see expression).,303/311,reversed
+REV_NVR617F316_tens,tens,(abs(winner - seed) >13),Eliminate if condition: (abs(winner - seed) >13),306/311,reversed
+REV_NVR643F315_tens,tens,(abs(winner - seed) >14),Eliminate if condition: (abs(winner - seed) >14),310/311,reversed
+REV_Nvr390F548_tens,tens,"(any(mirror.get(d,None) in combo_digits for d in combo_digits))","Eliminate if condition: (any(mirror.get(d,None) in combo_digits for d in combo_digits))",305/311,reversed
