@@ -272,7 +272,7 @@ REV_346F551_tens,tens,"(any(mirror.get(d,None) in combo_digits for d in combo_di
 REV_4F565_tens,tens,(len(set(combo_digits).intersection(seed_digits)) <= 1),Eliminate if the combo shares 1 or fewer digits with the seed.,311/311,reversed
 REV_5F566_tens,tens,(len(set(combo_digits).intersection(seed_digits)) <= 2),Eliminate if the combo shares 2 or fewer digits with the seed.,298/311,reversed
 REV_5F569_tens,tens,(len(set(combo_digits).intersection(seed_digits)) < 3),Eliminate if the combo shares fewer than 3 digits with the seed.,298/311,reversed
-REV_5F570_tens,tens,(list(Counter(combo_digits).values()).count(2) + list(Counter(combo_digits).values()).count(3) <= 1),Eliminate if the digits form either a triple and a pair (3-2), or two pairs (2-2-1).,271/311,reversed
+REV_5F570_tens,tens,(list(Counter(combo_digits).values()).count(2) + list(Counter(combo_digits).values()).count(3) <= 1),Eliminate if the digits do not form either a triple and a pair (3-2), or two pairs (2-2-1).,271/311,reversed
 REV_7F623_tens,tens,(winner >= 20),Eliminate if the combo matches: (winner >= 20),263/311,reversed
 REV_NO110F721_tens,tens,(len(set(combo_digits) & set(seed_digits)) <= 2),Eliminate if the combo shares 2 or fewer digits with the seed.,298/311,reversed
 REV_NO123F252_tens,tens,(not (20>winner>28)),Eliminate if the combo matches: (not (20>winner>28)),263/311,reversed
