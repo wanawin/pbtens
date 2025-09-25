@@ -311,7 +311,7 @@ def auto_hot_cold_due(seed: str, prevs: list[str]) -> tuple[list[int], list[int]
 # -----------------------------
 # UI
 # -----------------------------
-st.set_page_config(page_title="Powerball Tens Filter App", layout="wide")
+st.set_page_config(page_title="Tens Filter App", layout="wide")
 
 st.sidebar.header("Inputs")
 seed = st.sidebar.text_input("Draw 1-back (required, 5 digits 0–6):", value="").strip()
