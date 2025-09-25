@@ -67,7 +67,7 @@ def load_filters(path: str, is_zone: bool = False) -> list[dict]:
         for i, raw in enumerate(rdr):
             row = _normalize_cols(raw)
             fid = _safe_id(row.get("id", row.get("filter_id", "")), f"row{i+1}")
-            layman = (row.get("layman") or row.get("layman_explanation") or "").strip()
+            layman = (row.get("layman_explanation") or row.get("layman") or "").strip()
             hist = (row.get("stat") or row.get("hist") or "").strip()
 
             code, cerr = _compile_row(row, fid)
