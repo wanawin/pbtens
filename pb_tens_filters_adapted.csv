@@ -92,7 +92,7 @@ filter_id,variant,expression,layman_explanation,stat,source
 1F701,tens,(winner > 29),Eliminate if the combo matches: (winner > 29),0/311,keeper
 1F703,tens,(winner > 27),Eliminate if the combo matches: (winner > 27),0/311,keeper
 1F711,tens,(winner > 33),Eliminate if the combo matches: (winner > 33),0/311,keeper
-1F719,tens,(len(set(combo_digits)) == 5 and max(combo_digits) - min(combo_digits) == 4 and len(set(combo_digits)) == 5),Eliminate if the combo uses 5 unique digits.,3/311,keeper
+1F719,tens,(len(set(combo_digits)) == 5 and max(combo_digits) - min(combo_digits) == 4 and len(set(combo_digits)) == 5),Eliminate if the combo uses 5 unique digits and the spread (highest minus lowest digit) equals 4.,3/311,keeper
 20F253,tens,(not (19<=winner<=25)),Eliminate if the combo matches: (not (19<=winner<=25)),234/311,keeper
 20F259,tens,(not (11<=winner<=26)),Eliminate if the combo matches: (not (11<=winner<=26)),42/311,keeper
 20F261,tens,(winner<16 or winner>25),Eliminate if the tens sum is less than 16 or greater than 25.,167/311,keeper
