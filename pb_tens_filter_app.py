@@ -2,51 +2,28 @@ import os
 import csv
 from collections import Counter
 from itertools import product
-
 import pandas as pd
 import streamlit as st
 
-# -----------------------------
-# Files
-# -----------------------------
 MANUAL_FILTER_CSV = "pb_tens_filters_adapted.csv"
 ZONE_FILTER_CSV_CANDIDATES = [
     "pb_tens_percentile_filters_updated.csv",
     "pb_tens_percentile_filters.csv",
 ]
 
-# -----------------------------
-# Constants
-# -----------------------------
-DIGITS = "0123456"  # tens-only model
+DIGITS = "0123456"  # tens-only
 LOW_SET = {0, 1, 2, 3, 4}
 HIGH_SET = {5, 6}
 
-# -----------------------------
-# Utilities
-# -----------------------------
-def _exists(path: str) -> bool:
-    return path and os.path.exists(path)
-
-def _first_existing(paths):
-    for p in paths:
-        if _exists(p):
-            return p
-    return None
-
-def _safe_id(raw: str, fallback: str) -> str:
-    return (raw or fallback).strip()
+def _exists(path: str) -> bool: return path and os.path.exists(path)
+def _first_existing(paths): return next((p for p in paths if _exists(p)), None)
+def _safe_id(raw: str, fallback: str) -> str: return (raw or fallback).strip()
 
 def _compile_row(row, fid):
-    """
-    Compile a row's 'expression' (Python) to code.
-    """
     expr_txt = (row.get("expression") or row.get("expr") or "").strip()
-    if not expr_txt:
-        return None, "empty expression"
+    if not expr_txt: return None, "empty expression"
     try:
-        code = compile(expr_txt, f"<expr:{fid}>", "eval")
-        return code, None
+        return compile(expr_txt, f"<expr:{fid}>", "eval"), None
     except SyntaxError as e:
         return None, str(e)
 
@@ -54,13 +31,7 @@ def _normalize_cols(raw: dict) -> dict:
     return {(k or "").strip().lower(): v for k, v in raw.items()}
 
 def load_filters(path: str, is_zone: bool = False) -> list[dict]:
-    """
-    Load either manual or zone filters from CSV.
-    CSV must contain: id (or filter_id), expression, layman_explanation (optional), stat or hist (optional).
-    """
-    if not _exists(path):
-        return []
-
+    if not _exists(path): return []
     out = []
     with open(path, newline="", encoding="utf-8") as f:
         rdr = csv.DictReader(f)
@@ -69,406 +40,121 @@ def load_filters(path: str, is_zone: bool = False) -> list[dict]:
             fid = _safe_id(row.get("id", row.get("filter_id", "")), f"row{i+1}")
             layman = (row.get("layman") or row.get("layman_explanation") or "").strip()
             hist = (row.get("stat") or row.get("hist") or "").strip()
-
             code, cerr = _compile_row(row, fid)
-            if cerr:
-                # keep a disabled placeholder so user sees why this row didn't load
-                out.append(
-                    dict(
-                        id=fid,
-                        layman=f"[syntax error: {cerr}] {layman}",
-                        hist=hist,
-                        code=None,
-                        is_zone=is_zone,
-                    )
-                )
-                continue
-
-            out.append(
-                dict(
-                    id=fid,
-                    layman=layman,
-                    hist=hist,
-                    code=code,
-                    is_zone=is_zone,
-                )
-            )
+            out.append(dict(id=fid, layman=f"[syntax error: {cerr}] {layman}" if cerr else layman,
+                            hist=hist, code=code, is_zone=is_zone))
     return out
 
 def sum_category(total: int) -> str:
-    if 0 <= total <= 10:
-        return "Very Low"
-    elif 11 <= total <= 13:
-        return "Low"
-    elif 14 <= total <= 17:
-        return "Mid"
+    if 0 <= total <= 10: return "Very Low"
+    elif 11 <= total <= 13: return "Low"
+    elif 14 <= total <= 17: return "Mid"
     return "High"
 
 def gen_raw_combos(seed: str, method: str) -> list[str]:
-    """
-    Return raw combos (with duplicates) as sorted-5-char strings of tens digits (0..6).
-    method: '1-digit'      => choose 1 digit from seed, plus 4 free digits
-            '2-digit pair' => choose any unordered pair from seed, plus 3 free digits
-    """
     seed_sorted = "".join(sorted(seed))
     raw = []
-
     if method == "1-digit":
         for d in seed_sorted:
             for p in product(DIGITS, repeat=4):
                 raw.append("".join(sorted(d + "".join(p))))
     else:
-        pairs = {
-            "".join(sorted((seed_sorted[i], seed_sorted[j])))
-            for i in range(5)
-            for j in range(i + 1, 5)
-        }
+        pairs = {"".join(sorted((seed_sorted[i], seed_sorted[j]))) for i in range(5) for j in range(i+1,5)}
         for pair in pairs:
             for p in product(DIGITS, repeat=3):
                 raw.append("".join(sorted(pair + "".join(p))))
-
     return raw
 
-def digits_from_str(s: str) -> list[int]:
-    return [int(x) for x in s] if s else []
-
-def make_ctx(seed: str,
-             prevs: list[str],
-             combo: str | None,
-             hot: list[int],
-             cold: list[int],
-             due: list[int]) -> dict:
-    """
-    Context exposed to filter expressions.
-    """
+def make_ctx(seed: str, prevs: list[str], combo: str, hot: list[int], cold: list[int], due: list[int]):
+    combo_digits = [int(c) for c in combo] if combo else []
     seed_digits = [int(c) for c in seed]
     prev_digits = [int(c) for c in (prevs[0] or "")] if prevs else []
     prev_prev_digits = [int(c) for c in (prevs[1] or "")] if len(prevs) > 1 else []
-
-    combo_digits = [int(c) for c in combo] if combo else []
-    # Sums etc. (for tens-only, winner_value is the sum of tens digits)
-    winner_value = sum(combo_digits) if combo_digits else 0
-    seed_value = sum(seed_digits) if seed_digits else 0
-
-    # Helpful derived values
-    ctx = {
-        "variant_name": "tens",  # so CSV rows that check variant_name=='tens' work
+    return {
+        "variant_name": "tens",
         "combo_digits": combo_digits,
-        "seed_value_digits": seed_digits,
         "seed_digits": seed_digits,
         "prev_seed_digits": prev_digits,
         "prev_prev_seed_digits": prev_prev_digits,
-        "winner_value": winner_value,
-        "seed_value": seed_value,
-        # counts
-        "winner_even_count": sum(1 for d in combo_digits if d % 2 == 0),
-        "winner_odd_count": sum(1 for d in combo_digits if d % 2 == 1),
+        "winner_value": sum(combo_digits),
+        "seed_value": sum(seed_digits),
+        "winner_even_count": sum(1 for d in combo_digits if d%2==0),
+        "winner_odd_count": sum(1 for d in combo_digits if d%2==1),
         "winner_unique_count": len(set(combo_digits)),
-        "winner_range": (max(combo_digits) - min(combo_digits)) if combo_digits else 0,
+        "winner_range": max(combo_digits)-min(combo_digits) if combo_digits else 0,
         "winner_low_count": sum(1 for d in combo_digits if d in LOW_SET),
         "winner_high_count": sum(1 for d in combo_digits if d in HIGH_SET),
-        # seed-derived
-        "last2": set(seed_digits) | set(prev_digits),
-        "common_to_both": set(seed_digits) & set(prev_digits),
-        # hot/cold/due
-        "hot_digits": hot,
-        "cold_digits": cold,
-        "due_digits": due,
-        # helpers
-        "Counter": Counter,
-        "sum_category": sum_category,
-        "abs": abs,
-        "len": len,
-        "set": set,
-        "sum": sum,
-        "min": min,
-        "max": max,
-        "any": any,
-        "all": all,
-        "int": int,
-        "str": str,
-    }
-    return ctx
-
-def apply_zone_filters_pre_dedup(raw_combos: list[str],
-                                 zone_filters: list[dict],
-                                 base_ctx: dict) -> list[str]:
-    """
-    Keep only combos that PASS all zone rules. (If any zone rule evaluates True => eliminate.)
-    Work on RAW list (with duplicates) before dedup.
-    """
-    if not zone_filters:
-        return list(raw_combos)
-
-    survivors = []
-    for c in raw_combos:
-        ctx = base_ctx | make_ctx(base_ctx["seed_str"], base_ctx["prev_strs"], c,
-                                  base_ctx["hot"], base_ctx["cold"], base_ctx["due"])
-        eliminate = False
-        for f in zone_filters:
-            if not f["code"]:
-                continue
-            try:
-                if eval(f["code"], {}, ctx):
-                    eliminate = True
-                    break
-            except Exception:
-                # if a zone row errors, ignore it
-                pass
-        if not eliminate:
-            survivors.append(c)
-    return survivors
-
-def initial_cut_counts(combos_unique: list[str],
-                       manual_filters: list[dict],
-                       base_ctx: dict) -> dict[str, int]:
-    out = {}
-    for f in manual_filters:
-        cuts = 0
-        code = f.get("code")
-        if not code:
-            out[f["id"]] = 0
-            continue
-        for c in combos_unique:
-            ctx = base_ctx | make_ctx(base_ctx["seed_str"], base_ctx["prev_strs"], c,
-                                      base_ctx["hot"], base_ctx["cold"], base_ctx["due"])
-            try:
-                if eval(code, {}, ctx):
-                    cuts += 1
-            except Exception:
-                pass
-        out[f["id"]] = cuts
-    return out
-
-def apply_manual_filters_sequential(combos_unique: list[str],
-                                    manual_filters: list[dict],
-                                    selection: dict[str, bool],
-                                    base_ctx: dict,
-                                    track_norm: str | None) -> tuple[list[str], dict]:
-    """
-    Apply selected filters, in the order displayed, with a running Remaining count.
-    Returns survivors + an audit dict for the tracked combo.
-    """
-    pool = list(combos_unique)
-    tracked_audit = {
-        "generated": track_norm in set(combos_unique) if track_norm else False,
-        "status": None,  # "survived" / "not_generated" / "eliminated_by:<id>"
+        "hot_digits": hot, "cold_digits": cold, "due_digits": due,
+        "Counter": Counter, "sum_category": sum_category, "abs": abs, "len": len, "set": set,
     }
 
-    if track_norm and track_norm not in set(combos_unique):
-        tracked_audit["status"] = "not_generated"
-
-    for f in manual_filters:
-        if not selection.get(f["id"], False):
-            continue
-        code = f.get("code")
-        if not code:
-            continue
-
-        survivors = []
-        for c in pool:
-            ctx = base_ctx | make_ctx(base_ctx["seed_str"], base_ctx["prev_strs"], c,
-                                      base_ctx["hot"], base_ctx["cold"], base_ctx["due"])
-            eliminate = False
-            try:
-                if eval(code, {}, ctx):
-                    eliminate = True
-            except Exception:
-                eliminate = False
-
-            if eliminate:
-                if track_norm and c == track_norm and tracked_audit["status"] != "not_generated":
-                    tracked_audit["status"] = f"eliminated_by:{f['id']}"
-                # drop it
-            else:
-                survivors.append(c)
-
-        pool = survivors
-
-    if track_norm and track_audit := tracked_audit:
-        if track_audit["status"] is None:
-            if track_norm in set(pool):
-                track_audit["status"] = "survived"
-            else:
-                # not seen through the pipeline => not generated (or removed by zones)
-                track_audit["status"] = "not_generated"
-
-    return pool, tracked_audit
-
-# --- FIX: hot/cold from 6 draws; due from 2 draws ---
 def auto_hot_cold_due(seed: str, prevs: list[str]) -> tuple[list[int], list[int], list[int]]:
-    """
-    hot/cold: based on last 6 draws (seed + prev2..prev6) => need 30 digits total
-    due:      based on last 2 draws (seed + prev2)       => need 10 digits total
-    """
-    # Hot/Cold ➜ last 6 draws if available
-    seq6 = "".join([s for s in [seed] + prevs if s])
-    hot, cold = [], []
-    if len(seq6) >= 30:  # 6 × 5 digits
-        cnt6 = Counter(int(ch) for ch in seq6)
-        hot = [d for d, _ in cnt6.most_common(3)]
-        cold = [d for d, _ in cnt6.most_common()[-3:]]
-
-    # Due ➜ only seed + prev2 (2 draws)
-    seq2 = "".join([s for s in [seed] + prevs[:1] if s])  # [:1] picks only prev2
+    # hot/cold from up to 10 draws if available
+    seq10 = "".join([seed] + [p for p in prevs if p])
+    hot = cold = []
+    if len(seq10) >= 50:
+        cnt = Counter(int(ch) for ch in seq10)
+        hot = [d for d,_ in cnt.most_common(3)]
+        cold = [d for d,_ in cnt.most_common()[-3:]]
+    # due always just 2 draws
+    seq2 = "".join([s for s in [seed] + prevs[:1] if s])
     due = []
-    if len(seq2) >= 10:  # 2 × 5 digits
+    if len(seq2) >= 10:
         cnt2 = Counter(int(ch) for ch in seq2)
         due = [d for d in range(7) if d not in cnt2]
-
     return hot, cold, due
 
-# -----------------------------
-# UI
-# -----------------------------
+# ------------------- UI -------------------
 st.set_page_config(page_title="Powerball Tens Filter App", layout="wide")
-
 st.sidebar.header("Inputs")
-seed = st.sidebar.text_input("Draw 1-back (required, 5 digits 0–6):", value="").strip()
-prev2 = st.sidebar.text_input("Draw 2-back (optional):", value="").strip()
-prev3 = st.sidebar.text_input("Draw 3-back (optional):", value="").strip()
-prev4 = st.sidebar.text_input("Draw 4-back (optional):", value="").strip()
-prev5 = st.sidebar.text_input("Draw 5-back (optional):", value="").strip()
-prev6 = st.sidebar.text_input("Draw 6-back (optional):", value="").strip()
+
+seed = st.sidebar.text_input("Draw 1-back (required, 5 digits 0–6):").strip()
+prevs = [st.sidebar.text_input(f"Draw {i}-back:", value="").strip() for i in range(2,11)]
 method = st.sidebar.selectbox("Generation Method:", ["1-digit", "2-digit pair"])
 
-hot_override = st.sidebar.text_input("Hot digits (override, comma-separated):", value="")
-cold_override = st.sidebar.text_input("Cold digits (override, comma-separated):", value="")
-due_override = st.sidebar.text_input("Due digits (override, comma-separated):", value="")
+hot_override = st.sidebar.text_input("Hot digits override:", value="")
+cold_override = st.sidebar.text_input("Cold digits override:", value="")
+due_override = st.sidebar.text_input("Due digits override:", value="")
 
-track = st.sidebar.text_input("Track/Test combo (e.g., 01234):", value="").strip()
+track = st.sidebar.text_input("Track/Test combo (e.g., 01234):").strip()
 track_norm = "".join(sorted("".join(ch for ch in track if ch.isdigit()))) if track else None
 
-preserve_tracked = st.sidebar.checkbox("Preserve tracked combos", value=False)
-inject_tracked = st.sidebar.checkbox("Inject tracked combos even if not generated", value=False)
-
-select_all_toggle = st.sidebar.checkbox("Select/Deselect all filters (shown)", value=False)
-hide_zero = st.sidebar.checkbox("Hide filters with 0 initial cuts", value=True)
-
-# Validate seed
-st.markdown("## 🎯 Powerball Tens Filter App")
-if len(seed) != 5 or any(ch not in DIGITS for ch in seed):
-    st.info("Enter a valid **Draw 1-back** (exactly 5 digits in 0–6) to begin.")
+if len(seed)!=5 or any(ch not in DIGITS for ch in seed):
+    st.info("Enter a valid 5-digit seed first.")
     st.stop()
 
-# ------------- Load filters -------------
-manual_csv_path = MANUAL_FILTER_CSV if _exists(MANUAL_FILTER_CSV) else None
-zone_csv_path = _first_existing(ZONE_FILTER_CSV_CANDIDATES)
+manual_filters = load_filters(MANUAL_FILTER_CSV, is_zone=False)
+zone_filters = load_filters(_first_existing(ZONE_FILTER_CSV_CANDIDATES), is_zone=True)
 
-manual_filters = load_filters(manual_csv_path or "", is_zone=False)
-zone_filters = load_filters(zone_csv_path or "", is_zone=True)
-
-# ------------- Hot / Cold / Due -------------
-prevs = [prev2, prev3, prev4, prev5, prev6]
 auto_hot, auto_cold, auto_due = auto_hot_cold_due(seed, prevs)
+parse_list = lambda txt: [int(t) for t in txt.replace(","," ").split() if t.isdigit() and 0<=int(t)<=6]
+hot = parse_list(hot_override) or auto_hot
+cold = parse_list(cold_override) or auto_cold
+due = parse_list(due_override) or auto_due
 
-def _parse_int_list(txt: str, lo=0, hi=6) -> list[int]:
-    out = []
-    for tok in txt.replace(",", " ").split():
-        if tok.isdigit():
-            v = int(tok)
-            if lo <= v <= hi:
-                out.append(v)
-    return out
+st.sidebar.markdown(f"Auto ➜ Hot {auto_hot} | Cold {auto_cold} | Due {auto_due}")
+st.sidebar.markdown(f"Using ➜ Hot {hot} | Cold {cold} | Due {due}")
 
-hot = _parse_int_list(hot_override) or auto_hot
-cold = _parse_int_list(cold_override) or auto_cold
-due = _parse_int_list(due_override) or auto_due
-
-st.sidebar.markdown(f"**Auto ➜** Hot {auto_hot} | Cold {auto_cold} | Due {auto_due}")
-st.sidebar.markdown(f"**Using ➜** Hot {hot} | Cold {cold} | Due {due}")
-
-# Hide hot/cold/due filters ONLY if all three lists are empty (no data yet)
-if not hot and not cold and not due:
-    st.sidebar.warning("⚠️ Not enough draws yet to compute hot/cold/due digits — those filters are hidden until ready.")
-    manual_filters = [f for f in manual_filters if not any(
-        kw in (f.get('layman','') + f.get('id','')).lower() for kw in ['hot','cold','due']
-    )]
-
-# ------------- Generate → Zones pre-dedup → Dedup -------------
 raw = gen_raw_combos(seed, method)
-base_ctx = {
-    "seed_str": seed,
-    "prev_strs": prevs,
-    "hot": hot,
-    "cold": cold,
-    "due": due,
-    "preserve_tracked": preserve_tracked,
-}
-
-raw_count = len(raw)
-raw_after_zones = apply_zone_filters_pre_dedup(raw, zone_filters, base_ctx)
-after_zones_count = len(raw_after_zones)
+base_ctx = {"seed_str": seed, "prev_strs": prevs, "hot": hot, "cold": cold, "due": due}
+raw_after_zones = [c for c in raw if all(not f["code"] or not eval(f["code"], {}, base_ctx | make_ctx(seed, prevs, c, hot, cold, due)) for f in zone_filters)]
 unique_baseline = sorted(set(raw_after_zones))
-unique_count = len(unique_baseline)
 
-# Optional injection of tracked combo (to inspect it even if not generated)
-if track_norm and inject_tracked and track_norm not in set(unique_baseline):
-    unique_baseline = sorted(set(unique_baseline + [track_norm]))
-    unique_count = len(unique_baseline)
+st.sidebar.write(f"Generated: {len(raw)} | After zones: {len(raw_after_zones)} | Unique: {len(unique_baseline)}")
 
-# Sidebar pipeline + live remaining area
-st.sidebar.markdown("### Pipeline")
-st.sidebar.write(f"Raw generated: **{raw_count}**")
-st.sidebar.write(f"Survive percentile pre-dedup: **{after_zones_count}**")
-st.sidebar.write(f"Unique enumeration: **{unique_count}**")
-remaining_placeholder = st.sidebar.empty()
+# Manual filter rendering
+init_counts = {f["id"]: sum(1 for c in unique_baseline if f.get("code") and eval(f["code"], {}, base_ctx | make_ctx(seed, prevs, c, hot, cold, due))) for f in manual_filters if f.get("code")}
+display_filters = sorted(manual_filters, key=lambda f: -init_counts.get(f["id"],0))
+selection_state = {f["id"]: st.checkbox(f"{f['id']} | {f['layman']} | init cut {init_counts.get(f['id'],0)}") for f in display_filters}
 
-# ------------- Manual filters (center) -------------
-# Initial cuts
-init_counts = initial_cut_counts(unique_baseline, [f for f in manual_filters if not f["is_zone"]], base_ctx)
-
-# Sort by aggression (descending) and optionally hide zero-cuts
-display_filters = sorted(
-    (f for f in manual_filters if not f["is_zone"]),
-    key=lambda f: -init_counts.get(f["id"], 0)
-)
-if hide_zero:
-    display_filters = [f for f in display_filters if init_counts.get(f["id"], 0) > 0]
-
-st.markdown("## 🛠 Manual Filters")
-st.caption(f"Applicable filters: **{len(display_filters)}**")
-
-# Render checkboxes in the main area
-selection_state = {}
+# Apply sequential filters
+pool = list(unique_baseline)
 for f in display_filters:
-    cid = f["id"]
-    cuts = init_counts.get(cid, 0)
-    label_bits = [f"{cid}: {f['layman']}".strip()]
-    if f.get("hist"):
-        label_bits.append(f"hist {f['hist']}")
-    label_bits.append(f"init cut {cuts}")
-    label = " | ".join(label_bits)
+    if selection_state.get(f["id"]):
+        pool = [c for c in pool if not (f.get("code") and eval(f["code"], {}, base_ctx | make_ctx(seed, prevs, c, hot, cold, due)))]
 
-    checked = st.checkbox(label, key=f"chk_{cid}", value=select_all_toggle)
-    selection_state[cid] = bool(checked)
-
-# ------------- Apply selected filters sequentially -------------
-survivors, track_audit = apply_manual_filters_sequential(
-    unique_baseline, display_filters, selection_state, base_ctx, track_norm
-)
-
-# Update live remaining
-remaining_placeholder.write(f"**Remaining after filters:** {len(survivors)}")
-
-# Tracked combo status (under the input)
-if track_norm:
-    if track_audit["status"] == "not_generated":
-        st.sidebar.warning("Tracked combo was **not generated** (or removed by zones).")
-    elif track_audit["status"] == "survived":
-        st.sidebar.success("Tracked combo **survived** all selected filters.")
-    elif track_audit["status"] and track_audit["status"].startswith("eliminated_by:"):
-        st.sidebar.error(f"Tracked combo **eliminated** by filter {track_audit['status'].split(':',1)[1]}.")
-    else:
-        st.sidebar.info("Tracked combo status: (ready)")
-
-# ------------- Survivors + downloads -------------
-st.markdown(f"### ✅ Final Survivors: **{len(survivors)}**")
-with st.expander("Show survivors"):
-    for c in survivors:
-        st.write(c)
-
-if survivors:
-    df_out = pd.DataFrame({"tens_combo": survivors})
-    st.download_button("Download survivors (CSV)", df_out.to_csv(index=False), "pb_tens_survivors.csv", "text/csv")
-    st.download_button("Download survivors (TXT)", "\n".join(survivors), "pb_tens_survivors.txt", "text/plain")
+st.write(f"### ✅ Survivors: {len(pool)}")
+if pool:
+    df = pd.DataFrame({"tens_combo": pool})
+    st.download_button("Download CSV", df.to_csv(index=False), "pb_tens_survivors.csv")
+    st.download_button("Download TXT", "\n".join(pool), "pb_tens_survivors.txt")
