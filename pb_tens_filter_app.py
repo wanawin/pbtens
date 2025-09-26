@@ -11,7 +11,7 @@ ZONE_FILTER_CSV_CANDIDATES = [
     "pb_tens_percentile_filters.csv",
 ]
 
-DIGITS = "0123456"  # tens-only
+DIGITS = "0123456"
 LOW_SET = {0, 1, 2, 3, 4}
 HIGH_SET = {5, 6}
 
@@ -136,14 +136,40 @@ st.sidebar.markdown(f"Auto ➜ Hot {auto_hot} | Cold {auto_cold} | Due {auto_due
 st.sidebar.markdown(f"Using ➜ Hot {hot} | Cold {cold} | Due {due}")
 
 raw = gen_raw_combos(seed, method)
-base_ctx = {"seed_str": seed, "prev_strs": prevs, "hot": hot, "cold": cold, "due": due}
-raw_after_zones = [c for c in raw if all(not f["code"] or not eval(f["code"], {}, base_ctx | make_ctx(seed, prevs, c, hot, cold, due)) for f in zone_filters)]
+
+# apply zone filters pre-dedup
+def pass_zone(combo):
+    ctx = make_ctx(seed, prevs, combo, hot, cold, due)
+    for f in zone_filters:
+        if f.get("code"):
+            try:
+                if eval(f["code"], {}, ctx):
+                    return False
+            except Exception:
+                pass
+    return True
+
+raw_after_zones = [c for c in raw if pass_zone(c)]
 unique_baseline = sorted(set(raw_after_zones))
 
 st.sidebar.write(f"Generated: {len(raw)} | After zones: {len(raw_after_zones)} | Unique: {len(unique_baseline)}")
 
-# Manual filter rendering
-init_counts = {f["id"]: sum(1 for c in unique_baseline if f.get("code") and eval(f["code"], {}, base_ctx | make_ctx(seed, prevs, c, hot, cold, due))) for f in manual_filters if f.get("code")}
+# Manual filter initial cut counts
+init_counts = {}
+for f in manual_filters:
+    cuts = 0
+    if not f.get("code"):
+        init_counts[f["id"]] = 0
+        continue
+    for c in unique_baseline:
+        ctx = make_ctx(seed, prevs, c, hot, cold, due)
+        try:
+            if eval(f["code"], {}, ctx):
+                cuts += 1
+        except Exception:
+            pass
+    init_counts[f["id"]] = cuts
+
 display_filters = sorted(manual_filters, key=lambda f: -init_counts.get(f["id"],0))
 selection_state = {f["id"]: st.checkbox(f"{f['id']} | {f['layman']} | init cut {init_counts.get(f['id'],0)}") for f in display_filters}
 
@@ -151,7 +177,7 @@ selection_state = {f["id"]: st.checkbox(f"{f['id']} | {f['layman']} | init cut {
 pool = list(unique_baseline)
 for f in display_filters:
     if selection_state.get(f["id"]):
-        pool = [c for c in pool if not (f.get("code") and eval(f["code"], {}, base_ctx | make_ctx(seed, prevs, c, hot, cold, due)))]
+        pool = [c for c in pool if not (f.get("code") and eval(f["code"], {}, make_ctx(seed, prevs, c, hot, cold, due)))]
 
 st.write(f"### ✅ Survivors: {len(pool)}")
 if pool:
