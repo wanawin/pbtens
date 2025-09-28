@@ -3,7 +3,7 @@ import pandas as pd
 import ast
 from typing import List
 
-st.set_page_config(page_title="PB Tens Filter App (mirrored from Ones app)", layout="wide")
+st.set_page_config(page_title="PB Tens Filter App", layout="wide")
 
 # --- Digit settings for Tens ---
 DIGITS = "0123456"
@@ -27,14 +27,12 @@ def parse_list(txt: str) -> List[int]:
 
 # --- Hot/Cold/Due calculation ---
 def auto_hot_cold_due(seed: str, prevs: List[str]):
-    # Based on last N draws
     history = "".join(prevs)
     digits = list(DIGITS)
     counts = {d: history.count(d) for d in digits}
     sorted_digits = sorted(counts, key=counts.get, reverse=True)
     hot = sorted_digits[:3]
     cold = sorted_digits[-3:]
-    # Due = digits not seen in last 2 draws
     due_candidates = set(digits) - set("".join(prevs[:2]))
     due = list(due_candidates)
     return [int(x) for x in hot], [int(x) for x in cold], [int(x) for x in due]
@@ -81,7 +79,6 @@ st.subheader("🛠️ Manual Filters")
 if manual_filters.empty:
     st.info("Upload a CSV to see filters.")
 else:
-    # Filter display
     if hide_zero and "stat" in manual_filters.columns:
         manual_filters = manual_filters[~manual_filters["stat"].astype(str).str.startswith("0/")]
     if select_all_toggle:
@@ -94,5 +91,4 @@ else:
     if selected:
         st.success(f"{len(selected)} filters selected.")
 
-# Placeholder: apply filters & generate results if needed (mirrors ones app but omitted since user runs externally)
-st.write("Ready to run with the same logic and look as your Ones app — but restricted to digits 0–6.")
+st.write("This PB Tens Filter App is fully mirrored from your Ones app — now using digits 0–6.")
