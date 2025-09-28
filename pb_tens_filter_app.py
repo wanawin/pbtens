@@ -23,13 +23,13 @@ ZONE_FILTER_CSV_CANDIDATES = [
 # Constants
 # -----------------------------
 DIGITS = "0123456"  # tens-only model
-LOW_SET = {0, 1, 2, 3, 4}
-HIGH_SET = {5, 6, 7, 8, 9}
+LOW_SET  = {0, 1, 2, 3, 4}
+HIGH_SET = {5, 6}   # <-- fix: only 5 & 6 are "high" in 0–6 world
 
 # Mirror digit map (0↔5, 1↔6, 2↔7, 3↔8, 4↔9)
 MIRROR_MAP = {0: 5, 1: 6, 2: 7, 3: 8, 4: 9, 5: 0, 6: 1, 7: 2, 8: 3, 9: 4}
 
-# V-Trac groups (adjust if your definition differs)
+# V-Trac groups (keep mapping identical to ones app)
 VTRAC_MAP = {
     0: 0, 5: 0,
     1: 1, 6: 1,
@@ -88,6 +88,10 @@ def sum_category(total: int) -> str:
     elif 14 <= total <= 17: return "Mid"
     return "High"
 
+def _valid_draw(s: str) -> bool:
+    """5 chars, each in 0–6."""
+    return isinstance(s, str) and len(s) == 5 and all(ch in DIGITS for ch in s)
+
 def gen_raw_combos(seed: str, method: str) -> list[str]:
     seed_sorted = "".join(sorted(seed))
     raw = []
@@ -126,31 +130,34 @@ def mirror(x):
 def auto_hot_cold_due(seed: str, prevs: list[str], hot_n: int = 3, cold_n: int = 3,
                       hot_window: int = 10, due_window: int = 2):
     """
-    Compute hot/cold from up to `hot_window` draws (seed + prevs) — works with any history length.
+    Compute hot/cold from up to `hot_window` draws (seed + prevs).
     Compute due from the last `due_window` draws.
-    Includes ties (you may get > hot_n or > cold_n if frequencies tie at the cutoff).
+    Restrict to tens digits 0–6.
     """
-    recents = [s for s in [seed] + prevs if s]
+    # Keep only valid 5-digit draws in 0–6
+    recents = [s for s in [seed] + prevs if _valid_draw(s)]
+
     # HOT/COLD
     seq_hotcold = "".join(recents[:hot_window])
     hot, cold = [], []
     if seq_hotcold:
-        cnt = Counter(int(ch) for ch in seq_hotcold)
+        cnt = Counter(int(ch) for ch in seq_hotcold if ch.isdigit() and 0 <= int(ch) <= 6)
         if cnt:
-            # HOT (top hot_n with ties)
-            freqs_desc = cnt.most_common()
+            freqs_desc = sorted(cnt.items(), key=lambda kv: (-kv[1], kv[0]))
             cutoff = freqs_desc[min(hot_n - 1, len(freqs_desc) - 1)][1] if freqs_desc else 0
             hot = sorted([d for d, c in cnt.items() if c >= cutoff])
-            # COLD (bottom cold_n with ties)
+
             freqs_asc = sorted(cnt.items(), key=lambda kv: (kv[1], kv[0]))
             cutoff_c = freqs_asc[min(cold_n - 1, len(freqs_asc) - 1)][1] if freqs_asc else 0
             cold = sorted([d for d, c in cnt.items() if c <= cutoff_c])
-    # DUE
+
+    # DUE: digits not seen in last two valid draws
     seq_due = "".join(recents[:due_window])
     due = []
     if seq_due:
-        seen = {int(ch) for ch in seq_due}
+        seen = {int(ch) for ch in seq_due if ch.isdigit() and 0 <= int(ch) <= 6}
         due = [d for d in range(7) if d not in seen]
+
     return hot, cold, due
 
 def make_ctx(seed: str, prevs: list[str], combo: str, hot: list[int], cold: list[int], due: list[int]):
@@ -165,13 +172,11 @@ def make_ctx(seed: str, prevs: list[str], combo: str, hot: list[int], cold: list
     combo_vtracs = [VTRAC_MAP[d] for d in combo_digits]
     seed_vtracs = [VTRAC_MAP[d] for d in seed_digits]
 
-    # Tens-variant scalar values:
-    # Many CSV expressions use 'winner'/'seed' — alias them to sum of digits (variant value)
+    # Variant scalar values:
     winner_val = sum(combo_digits)
     seed_val = sum(seed_digits)
 
     return {
-        # Variant
         "variant_name": "tens",
 
         # Core digit context
@@ -182,11 +187,11 @@ def make_ctx(seed: str, prevs: list[str], combo: str, hot: list[int], cold: list
         "combo_digits_set": set(combo_digits),
         "seed_digits_set": set(seed_digits),
 
-        # Scalars commonly referenced in expressions
+        # Scalars (aliases)
         "winner_value": winner_val,
         "seed_value": seed_val,
-        "winner": winner_val,   # alias so expressions using 'winner' work
-        "seed": seed_val,       # alias so expressions using 'seed' work
+        "winner": winner_val,   # alias for expressions using 'winner'
+        "seed": seed_val,       # alias for expressions using 'seed'
 
         # Precomputed stats
         "winner_even_count": sum(1 for d in combo_digits if d % 2 == 0),
@@ -218,7 +223,10 @@ def make_ctx(seed: str, prevs: list[str], combo: str, hot: list[int], cold: list
     }
 
 def apply_zone_filters(raw_combos, zone_filters, seed, prevs, hot, cold, due):
+    if not zone_filters:
+        return list(raw_combos)
     survivors = []
+    killed = 0
     for c in raw_combos:
         ctx = make_ctx(seed, prevs, c, hot, cold, due)
         eliminate = False
@@ -229,10 +237,16 @@ def apply_zone_filters(raw_combos, zone_filters, seed, prevs, hot, cold, due):
                         eliminate = True
                         break
                 except Exception:
-                    # ignore broken filters but keep running
+                    # ignore broken zone filters
                     pass
-        if not eliminate:
+        if eliminate:
+            killed += 1
+        else:
             survivors.append(c)
+    # Safety: don't wipe the pool silently
+    if not survivors and raw_combos:
+        st.warning("Zone filters eliminated all candidates. Skipping zone filters for this run.")
+        return list(raw_combos)
     return survivors
 
 # ------------------- UI -------------------
@@ -255,8 +269,13 @@ inject_tracked = st.sidebar.checkbox("Inject tracked combos even if not generate
 select_all_toggle = st.sidebar.checkbox("Select/Deselect all filters (shown)", value=False)
 hide_zero = st.sidebar.checkbox("Hide filters with 0 initial cuts", value=True)
 
-if len(seed) != 5 or any(ch not in DIGITS for ch in seed):
-    st.info("Enter a valid 5-digit seed first.")
+# Validate inputs early
+if not _valid_draw(seed):
+    st.info("Enter a valid 5-digit seed first (digits 0–6).")
+    st.stop()
+bad_prevs = [p for p in prevs if p and not _valid_draw(p)]
+if bad_prevs:
+    st.warning(f"Invalid previous draws: {', '.join(bad_prevs)}. Must be 5 digits, digits 0–6.")
     st.stop()
 
 # Load filters
@@ -267,7 +286,7 @@ zone_filters = load_filters(zone_path, is_zone=True)
 
 # Hot/Cold/Due (auto with optional overrides)
 auto_hot, auto_cold, auto_due = auto_hot_cold_due(seed, prevs)
-parse_list = lambda txt: [int(t) for t in txt.replace(",", " ").split() if t.isdigit() and 0 <= int(t) <= 9]
+parse_list = lambda txt: [int(t) for t in txt.replace(",", " ").split() if t.isdigit() and 0 <= int(t) <= 6]
 hot = parse_list(hot_override) or auto_hot
 cold = parse_list(cold_override) or auto_cold
 due = parse_list(due_override) or auto_due
@@ -308,6 +327,7 @@ for f in manual_filters:
             if eval(f["code"], {}, ctx):
                 cuts += 1
         except Exception:
+            # ignore broken expressions, keep app running
             pass
     init_counts[f["id"]] = cuts
 
@@ -359,18 +379,18 @@ if track_norm and track_status is None:
 
 remaining_placeholder.write(f"**Remaining after filters:** {len(pool)}")
 
-if track_norm:
-    if track_status == "not_generated":
-        st.sidebar.warning("Tracked combo was **not generated** (or removed by ztens).")
-    elif track_status == "survived":
-        st.sidebar.success("Tracked combo **survived** all selected filters.")
-    elif track_status and track_status.startswith("eliminated_by:"):
-        st.sidebar.error(f"Tracked combo **eliminated** by filter {track_status.split(':',1)[1]}.")
-
 st.markdown(f"### ✅ Final Survivors: **{len(pool)}**")
 with st.expander("Show survivors"):
     for c in pool:
         st.write(c)
+
+if track_norm:
+    if track_status == "not_generated":
+        st.sidebar.warning("Tracked combo was **not generated** (or removed by zone filters).")
+    elif track_status == "survived":
+        st.sidebar.success("Tracked combo **survived** all selected filters.")
+    elif track_status and track_status.startswith("eliminated_by:"):
+        st.sidebar.error(f"Tracked combo **eliminated** by filter {track_status.split(':',1)[1]}.")
 
 if pool:
     df_out = pd.DataFrame({"tens_combo": pool})
