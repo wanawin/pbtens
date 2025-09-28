@@ -15,7 +15,7 @@ MANUAL_FILTER_CSV_CANDIDATES = [
     "filters_tens_cleaned.csv",
 ]
 ZONE_FILTER_CSV_CANDIDATES = [
-    "pb_tens_percentile_filters_final.csv",
+    "pb_tens_percentile_filters.csv",
     "filters_tens_cleaned.csv",
 ]
 
